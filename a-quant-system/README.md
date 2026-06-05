@@ -126,6 +126,23 @@ python backtest.py --trade-date 2026-06-05 --hold-days 3
 - 最后一个持有日收盘卖出
 - 输出平均收益、胜率、最大回撤和 Markdown 回测报告
 
+## 本地验证页
+
+生成只读取正式 SQLite 的验证页：
+
+```bash
+python dashboard.py
+python3 -m http.server 8081
+```
+
+打开：
+
+```text
+http://127.0.0.1:8081/reports/status.html
+```
+
+如果真实行情尚未成功入库，页面会显示正式记录数为 `0`。
+
 ## 终局架构
 
 系统会演进为多 Agent 决策链：
