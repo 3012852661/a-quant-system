@@ -73,8 +73,8 @@ def fetch_daily_kline(
     return rows
 
 
-def load_fallback_rows(path: Path | None = None, limit: int | None = None) -> list[dict[str, Any]]:
-    """Load local report rows so the daily pipeline can run without network."""
+def load_dev_rows(path: Path | None = None, limit: int | None = None) -> list[dict[str, Any]]:
+    """Load local rows only for explicit development tests, never for production."""
     report_path = path or _repo_root() / "reports/data/latest-free-a-share-scan.brief.json"
     payload = json.loads(report_path.read_text(encoding="utf-8"))
     rows: list[dict[str, Any]] = []
@@ -96,9 +96,11 @@ def load_fallback_rows(path: Path | None = None, limit: int | None = None) -> li
     return normalized
 
 
-def get_market_rows(limit: int | None = None, fallback_path: Path | None = None) -> tuple[list[dict[str, Any]], str]:
-    try:
-        return fetch_a_share_spot(limit=limit), "akshare.stock_zh_a_spot_em"
-    except Exception as exc:
-        rows = load_fallback_rows(path=fallback_path, limit=limit)
-        return rows, f"fallback:{exc.__class__.__name__}"
+def get_market_rows(
+    limit: int | None = None,
+    dev_data_path: Path | None = None,
+    allow_dev_data: bool = False,
+) -> tuple[list[dict[str, Any]], str]:
+    if allow_dev_data:
+        return load_dev_rows(path=dev_data_path, limit=limit), "dev-local-report"
+    return fetch_a_share_spot(limit=limit), "akshare.stock_zh_a_spot_em"

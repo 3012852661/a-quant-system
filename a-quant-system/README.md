@@ -36,8 +36,15 @@ pip install -r requirements.txt
 python main.py --trade-date 2026-06-05
 ```
 
-如果 AkShare 或网络不可用，系统会自动读取上层目录已有的
-`reports/data/latest-free-a-share-scan.brief.json` 作为 fallback，保证每日留痕流程不断。
+系统默认只使用 AkShare 真实行情。若 AkShare、网络或接口失败，本次运行会直接失败，不会写入数据库，也不会生成正式日报。
+
+开发调试时可以显式读取本地报告数据：
+
+```bash
+python main.py --trade-date 2026-06-05 --allow-dev-data
+```
+
+带 `--allow-dev-data` 的结果只能用于调试页面和流程，不能作为策略样本或正式日报。
 
 ## 策略条件
 

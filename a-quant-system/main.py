@@ -20,7 +20,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--report-dir", default="reports/daily")
     parser.add_argument("--csv-dir", default="data/daily")
     parser.add_argument("--log-file", default="logs/daily.log")
-    parser.add_argument("--fallback", default="../reports/data/latest-free-a-share-scan.brief.json")
+    parser.add_argument("--dev-data", default="../reports/data/latest-free-a-share-scan.brief.json")
+    parser.add_argument(
+        "--allow-dev-data",
+        action="store_true",
+        help="Use local report data for development only. Do not use for production records.",
+    )
     return parser.parse_args()
 
 
@@ -43,11 +48,28 @@ def main() -> int:
     report_dir = root / args.report_dir
     csv_dir = root / args.csv_dir
     log_path = root / args.log_file
-    fallback_path = (root / args.fallback).resolve()
+    dev_data_path = (root / args.dev_data).resolve()
     setup_logging(log_path)
 
     logging.info("daily selection started trade_date=%s", args.trade_date)
-    rows, source = get_market_rows(limit=args.fetch_limit, fallback_path=fallback_path)
+    try:
+        rows, source = get_market_rows(
+            limit=args.fetch_limit,
+            dev_data_path=dev_data_path,
+            allow_dev_data=args.allow_dev_data,
+        )
+    except Exception as exc:
+        logging.error(
+            "real market data fetch failed; no fallback data was used: %s: %s",
+            exc.__class__.__name__,
+            exc,
+        )
+        print("ERROR: 真实行情获取失败，本次未生成股票池、未写入数据库、未生成日报。")
+        print(f"reason: {exc.__class__.__name__}: {exc}")
+        print("请检查 AkShare、网络连接或数据接口变更后重试。")
+        return 1
+    if args.allow_dev_data:
+        logging.warning("development data mode enabled; do not treat output as production signal")
     logging.info("loaded market rows=%s source=%s", len(rows), source)
     stock_pool = select_stock_pool(rows, limit=args.limit)
     saved = save_stock_pool(db_path, args.trade_date, stock_pool)
