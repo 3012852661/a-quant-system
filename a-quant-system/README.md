@@ -41,7 +41,9 @@ pip install -r requirements.txt
 python main.py --trade-date 2026-06-05
 ```
 
-系统默认只使用 AkShare 真实行情。若 AkShare、网络或接口失败，本次运行会直接失败，不会写入数据库，也不会生成正式日报。
+系统默认只使用真实行情。优先使用 AkShare；如果当前 Python/requests 环境无法解析 AkShare 选中的东方财富节点，会切换到系统 `curl` 请求东方财富实时行情接口。两条路径都是真实行情源。
+
+若真实行情源全部失败，本次运行会直接失败，不会写入数据库，也不会生成正式日报。
 
 开发调试时可以显式读取本地报告数据：
 

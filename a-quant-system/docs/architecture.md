@@ -38,11 +38,12 @@ Codex
 
 - `akshare.stock_zh_a_spot_em`
 - `akshare.stock_zh_a_hist`
+- `eastmoney.curl.clist`，用于 Python requests DNS 异常时的真实行情备用通道
 
 失败策略：
 
 - 默认失败退出。
-- 不自动 fallback。
+- 不自动使用本地文件 fallback。
 - 不写入正式 SQLite。
 
 ### 新闻Agent

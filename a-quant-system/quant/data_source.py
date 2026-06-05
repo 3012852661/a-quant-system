@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlencode
 
 
 def _repo_root() -> Path:
@@ -39,6 +41,101 @@ def fetch_a_share_spot(limit: int | None = None) -> list[dict[str, Any]]:
     if limit:
         frame = frame.head(limit)
     return [_normalize_row(row.to_dict()) for _, row in frame.iterrows()]
+
+
+def _normalize_eastmoney_row(row: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "code": str(row.get("f12") or "").zfill(6),
+        "name": str(row.get("f14") or ""),
+        "price": _to_float(row.get("f2")),
+        "pct_chg": _to_float(row.get("f3")),
+        "turnover": _to_float(row.get("f8")),
+        "volume_ratio": _to_float(row.get("f10"), 1.0),
+        "market_cap": _to_float(row.get("f20")),
+    }
+
+
+def fetch_eastmoney_spot_with_curl(
+    limit: int | None = None,
+    page_size: int = 100,
+    max_pages: int = 80,
+) -> list[dict[str, Any]]:
+    """Fetch realtime A-share spot data from Eastmoney using system curl."""
+    rows: list[dict[str, Any]] = []
+    base_urls = (
+        "https://push2.eastmoney.com/api/qt/clist/get",
+        "https://push2delay.eastmoney.com/api/qt/clist/get",
+        "http://push2.eastmoney.com/api/qt/clist/get",
+        "http://77.push2.eastmoney.com/api/qt/clist/get",
+    )
+    fields = "f12,f14,f2,f3,f8,f10,f20"
+    fs = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23"
+
+    for page in range(1, max_pages + 1):
+        params = {
+            "pn": page,
+            "pz": page_size,
+            "po": 1,
+            "np": 1,
+            "fltt": 2,
+            "invt": 2,
+            "fid": "f3",
+            "fs": fs,
+            "fields": fields,
+        }
+        payload = None
+        errors: list[str] = []
+        for base_url in base_urls:
+            url = f"{base_url}?{urlencode(params)}"
+            result = subprocess.run(
+                [
+                    "curl",
+                    "-L",
+                    "-sS",
+                    "--ipv4",
+                    "--connect-timeout",
+                    "5",
+                    "--max-time",
+                    "10",
+                    "--retry",
+                    "2",
+                    "--retry-delay",
+                    "1",
+                    "--compressed",
+                    "-A",
+                    "Mozilla/5.0",
+                    "-e",
+                    "https://quote.eastmoney.com/",
+                    url,
+                ],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                errors.append(f"{base_url}: curl exit {result.returncode} {result.stderr.strip()}")
+                continue
+            try:
+                payload = json.loads(result.stdout)
+                break
+            except json.JSONDecodeError as exc:
+                errors.append(f"{base_url}: json error {exc}")
+        if payload is None:
+            last_pct = _to_float(rows[-1]["pct_chg"]) if rows else 999.0
+            if rows and last_pct < 3:
+                break
+            raise RuntimeError(f"Eastmoney page {page} failed: {' | '.join(errors)}")
+        diff = payload.get("data", {}).get("diff") or []
+        if not diff:
+            break
+        page_rows = [_normalize_eastmoney_row(item) for item in diff]
+        rows.extend(page_rows)
+        if limit and len(rows) >= limit:
+            return rows[:limit]
+        if page_rows and _to_float(page_rows[-1]["pct_chg"]) < 3:
+            break
+        if len(diff) < page_size:
+            break
+    return rows
 
 
 def fetch_daily_kline(
@@ -103,4 +200,7 @@ def get_market_rows(
 ) -> tuple[list[dict[str, Any]], str]:
     if allow_dev_data:
         return load_dev_rows(path=dev_data_path, limit=limit), "dev-local-report"
-    return fetch_a_share_spot(limit=limit), "akshare.stock_zh_a_spot_em"
+    try:
+        return fetch_a_share_spot(limit=limit), "akshare.stock_zh_a_spot_em"
+    except Exception:
+        return fetch_eastmoney_spot_with_curl(limit=limit), "eastmoney.curl.clist"
