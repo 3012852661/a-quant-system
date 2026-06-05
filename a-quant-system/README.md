@@ -13,13 +13,18 @@
 ```text
 a-quant-system/
 ├── main.py
+├── backtest.py
 ├── requirements.txt
+├── docs/
+│   └── architecture.md
 ├── data/
 │   └── stock_pool.db
 ├── reports/
 │   └── daily/
 ├── quant/
+│   ├── agents/
 │   ├── data_source.py
+│   ├── pipeline.py
 │   ├── strategy.py
 │   ├── storage.py
 │   └── report.py
@@ -120,3 +125,27 @@ python backtest.py --trade-date 2026-06-05 --hold-days 3
 - 持有 `hold-days` 个交易日
 - 最后一个持有日收盘卖出
 - 输出平均收益、胜率、最大回撤和 Markdown 回测报告
+
+## 终局架构
+
+系统会演进为多 Agent 决策链：
+
+```text
+Codex
+├── 数据Agent
+├── 新闻Agent
+├── 技术分析Agent
+├── 基本面Agent
+├── 风控Agent
+└── 交易Agent
+
+↓
+
+回测
+
+↓
+
+实盘
+```
+
+详细设计见 [docs/architecture.md](docs/architecture.md)。
