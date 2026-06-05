@@ -79,3 +79,29 @@ def count_by_date(db_path: Path, trade_date: str) -> int:
             "SELECT COUNT(*) FROM stock_pool WHERE trade_date = ?",
             (trade_date,),
         ).fetchone()[0]
+
+
+def load_stock_pool(db_path: Path, trade_date: str | None = None) -> list[dict]:
+    init_db(db_path)
+    sql = """
+        SELECT trade_date, code, name, price, pct_chg, turnover,
+               volume_ratio, market_cap, score, created_at
+        FROM stock_pool
+    """
+    params: tuple[str, ...] = ()
+    if trade_date:
+        sql += " WHERE trade_date = ?"
+        params = (trade_date,)
+    sql += " ORDER BY trade_date, score DESC"
+    with sqlite3.connect(db_path) as conn:
+        conn.row_factory = sqlite3.Row
+        return [dict(row) for row in conn.execute(sql, params).fetchall()]
+
+
+def list_trade_dates(db_path: Path) -> list[str]:
+    init_db(db_path)
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute(
+            "SELECT DISTINCT trade_date FROM stock_pool ORDER BY trade_date"
+        ).fetchall()
+    return [row[0] for row in rows]

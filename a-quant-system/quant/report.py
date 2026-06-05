@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 from pathlib import Path
 
 
@@ -63,5 +64,60 @@ def write_daily_report(
             "> 仅用于研究和模拟跟踪，不构成投资建议。",
         ]
     )
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return path
+
+
+def write_daily_csv(csv_dir: Path, trade_date: str, rows: list[dict]) -> Path:
+    csv_dir.mkdir(parents=True, exist_ok=True)
+    path = csv_dir / f"stock_pool_{trade_date}.csv"
+    columns = [
+        "trade_date",
+        "code",
+        "name",
+        "price",
+        "pct_chg",
+        "turnover",
+        "volume_ratio",
+        "market_cap",
+        "score",
+    ]
+    with path.open("w", encoding="utf-8-sig", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=columns)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({"trade_date": trade_date, **{key: row[key] for key in columns if key != "trade_date"}})
+    return path
+
+
+def write_backtest_report(report_dir: Path, result: dict) -> Path:
+    report_dir.mkdir(parents=True, exist_ok=True)
+    name = result["trade_date"] or "all"
+    path = report_dir / f"backtest_{name}.md"
+    lines = [
+        f"# 策略回测 - {name}",
+        "",
+        f"- 股票池记录：{result['pool_rows']}",
+        f"- 成交样本：{result['trades']}",
+        f"- 持有天数：{result['hold_days']}",
+        f"- 平均收益：{result['average_return_pct']:.2f}%",
+        f"- 胜率：{result['win_rate_pct']:.2f}%",
+        f"- 最大回撤：{result['max_drawdown_pct']:.2f}%",
+        "",
+        "## 样本交易",
+        "",
+        "| 代码 | 名称 | 选股日 | 买入日 | 卖出日 | 买入价 | 卖出价 | 收益率 |",
+        "|---|---|---|---|---|---:|---:|---:|",
+    ]
+    for trade in result["trade_samples"]:
+        lines.append(
+            "| {code} | {name} | {trade_date} | {buy_date} | {sell_date} | "
+            "{buy_price:.2f} | {sell_price:.2f} | {return_pct:.2f}% |".format(**trade)
+        )
+    if not result["trade_samples"]:
+        lines.append("| - | - | - | - | - | - | - | - |")
+    if result["skip_samples"]:
+        lines.extend(["", "## 跳过样本", ""])
+        lines.extend(f"- {item}" for item in result["skip_samples"])
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path

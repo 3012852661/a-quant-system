@@ -81,6 +81,13 @@ volume_ratio, market_cap, score, created_at
 
 ```text
 reports/daily/YYYY-MM-DD.md
+data/daily/stock_pool_YYYY-MM-DD.csv
+```
+
+运行日志写入：
+
+```text
+logs/daily.log
 ```
 
 ## 下一阶段
@@ -92,3 +99,17 @@ reports/daily/YYYY-MM-DD.md
 - 持有 3 天
 - 第 3 天收盘卖出
 - 统计收益率、胜率、最大回撤
+
+当前已经提供最小回测入口：
+
+```bash
+python backtest.py --trade-date 2026-06-05 --hold-days 3
+```
+
+回测逻辑：
+
+- 读取 SQLite 中当天股票池
+- 第二个交易日开盘买入
+- 持有 `hold-days` 个交易日
+- 最后一个持有日收盘卖出
+- 输出平均收益、胜率、最大回撤和 Markdown 回测报告

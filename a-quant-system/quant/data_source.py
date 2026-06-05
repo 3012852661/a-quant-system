@@ -41,6 +41,38 @@ def fetch_a_share_spot(limit: int | None = None) -> list[dict[str, Any]]:
     return [_normalize_row(row.to_dict()) for _, row in frame.iterrows()]
 
 
+def fetch_daily_kline(
+    code: str,
+    start_date: str,
+    end_date: str,
+    adjust: str = "qfq",
+) -> list[dict[str, Any]]:
+    """Fetch daily kline data for one A-share stock with AkShare."""
+    import akshare as ak  # type: ignore
+
+    frame = ak.stock_zh_a_hist(
+        symbol=code,
+        period="daily",
+        start_date=start_date.replace("-", ""),
+        end_date=end_date.replace("-", ""),
+        adjust=adjust,
+    )
+    rows: list[dict[str, Any]] = []
+    for _, row in frame.iterrows():
+        rows.append(
+            {
+                "trade_date": str(row.get("日期")),
+                "open": _to_float(row.get("开盘")),
+                "close": _to_float(row.get("收盘")),
+                "high": _to_float(row.get("最高")),
+                "low": _to_float(row.get("最低")),
+                "volume": _to_float(row.get("成交量")),
+                "amount": _to_float(row.get("成交额")),
+            }
+        )
+    return rows
+
+
 def load_fallback_rows(path: Path | None = None, limit: int | None = None) -> list[dict[str, Any]]:
     """Load local report rows so the daily pipeline can run without network."""
     report_path = path or _repo_root() / "reports/data/latest-free-a-share-scan.brief.json"
