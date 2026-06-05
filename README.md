@@ -11,30 +11,28 @@
 ## 目录
 
 ```text
-a-quant-system/
-├── main.py
-├── backtest.py
-├── requirements.txt
-├── docs/
-│   └── architecture.md
-├── data/
-│   └── stock_pool.db
-├── reports/
-│   └── daily/
-├── quant/
-│   ├── agents/
-│   ├── data_source.py
-│   ├── pipeline.py
-│   ├── strategy.py
-│   ├── storage.py
-│   └── report.py
-└── README.md
+main.py
+backtest.py
+requirements.txt
+docs/
+└── architecture.md
+data/
+└── stock_pool.db
+reports/
+└── daily/
+quant/
+├── agents/
+├── data_source.py
+├── pipeline.py
+├── strategy.py
+├── storage.py
+└── report.py
+README.md
 ```
 
 ## 运行
 
 ```bash
-cd a-quant-system
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
