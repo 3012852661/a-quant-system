@@ -1,0 +1,8 @@
+{
+  "mode": "PAPER",
+  "cash": 100000,
+  "initialCash": 100000,
+  "positions": [],
+  "orders": [],
+  "trades": []
+}

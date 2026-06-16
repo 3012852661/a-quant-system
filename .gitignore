@@ -1,5 +1,17 @@
 .venv/
+.venv*/
 __pycache__/
 *.py[cod]
 logs/
 .DS_Store
+.env
+.env.*
+*.db
+*.sqlite
+*.sqlite3
+node_modules/
+.next/
+.next.broken*/
+outputs/*
+!outputs/quant_analysis_20260615/
+!outputs/quant_analysis_20260615/**

@@ -1,0 +1,322 @@
+{
+  "generatedAt": "2026-06-16T10:55:08",
+  "marketState": {
+    "status": "ACTIVE",
+    "score": 8,
+    "note": "选股同步已完成，仍需结合盘中承接与风控确认。"
+  },
+  "counts": {
+    "newLimitUp": 0,
+    "limitUp": 0,
+    "strongToLimit": 0,
+    "strongNotLimit": 30
+  },
+  "newLimitUps": [],
+  "strongToLimit": [],
+  "removedLimitUps": [],
+  "newStrong": [
+    {
+      "code": "301120",
+      "name": "新特电气",
+      "pct": 5.68,
+      "price": 20.11,
+      "turnover": 6.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "003031",
+      "name": "中瓷电子",
+      "pct": 5.21,
+      "price": 158.3,
+      "turnover": 3.22,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600973",
+      "name": "宝胜股份",
+      "pct": 4.87,
+      "price": 6.89,
+      "turnover": 3.66,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603690",
+      "name": "至纯科技",
+      "pct": 4.65,
+      "price": 28.79,
+      "turnover": 6.24,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "pct": 4.22,
+      "price": 89.21,
+      "turnover": 4.93,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "000600",
+      "name": "建投能源",
+      "pct": 4.49,
+      "price": 10.7,
+      "turnover": 3.79,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002350",
+      "name": "北京科锐",
+      "pct": 6.02,
+      "price": 16.38,
+      "turnover": 3.12,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300302",
+      "name": "同有科技",
+      "pct": 5.57,
+      "price": 48.56,
+      "turnover": 9.94,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002183",
+      "name": "怡 亚 通",
+      "pct": 5.16,
+      "price": 5.71,
+      "turnover": 3.85,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "pct": 5.15,
+      "price": 24.72,
+      "turnover": 5.01,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002185",
+      "name": "华天科技",
+      "pct": 4.5,
+      "price": 17.9,
+      "turnover": 6.32,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "pct": 5.26,
+      "price": 81.45,
+      "turnover": 5.47,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300121",
+      "name": "阳谷华泰",
+      "pct": 4.29,
+      "price": 11.92,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603315",
+      "name": "福鞍股份",
+      "pct": 5.16,
+      "price": 17.13,
+      "turnover": 3.57,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301218",
+      "name": "华是科技",
+      "pct": 4.06,
+      "price": 44.81,
+      "turnover": 8.49,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002965",
+      "name": "祥鑫科技",
+      "pct": 5.26,
+      "price": 42.6,
+      "turnover": 7.0,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002167",
+      "name": "东方锆业",
+      "pct": 4.14,
+      "price": 15.36,
+      "turnover": 8.97,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "001326",
+      "name": "联域股份",
+      "pct": 5.04,
+      "price": 68.33,
+      "turnover": 3.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301489",
+      "name": "思泉新材",
+      "pct": 4.39,
+      "price": 152.41,
+      "turnover": 6.28,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301261",
+      "name": "恒工精密",
+      "pct": 4.31,
+      "price": 88.65,
+      "turnover": 5.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    }
+  ],
+  "attackThemes": [],
+  "attackCandidates": [
+    {
+      "grade": "A",
+      "code": "301120",
+      "name": "新特电气",
+      "theme": "-",
+      "pct": 5.68,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 19.21,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "003031",
+      "name": "中瓷电子",
+      "theme": "-",
+      "pct": 5.21,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 151.18,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "600973",
+      "name": "宝胜股份",
+      "theme": "-",
+      "pct": 4.87,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 6.58,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "603690",
+      "name": "至纯科技",
+      "theme": "-",
+      "pct": 4.65,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 27.49,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "603026",
+      "name": "石大胜华",
+      "theme": "-",
+      "pct": 4.22,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 85.2,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "000600",
+      "name": "建投能源",
+      "theme": "-",
+      "pct": 4.49,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 10.22,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "002350",
+      "name": "北京科锐",
+      "theme": "-",
+      "pct": 6.02,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 15.48,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "300302",
+      "name": "同有科技",
+      "theme": "-",
+      "pct": 5.57,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 46.37,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "002183",
+      "name": "怡 亚 通",
+      "theme": "-",
+      "pct": 5.16,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 5.45,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    },
+    {
+      "grade": "A",
+      "code": "603032",
+      "name": "德新科技",
+      "theme": "-",
+      "pct": 5.15,
+      "trigger": "当日涨幅处于3%-7%强势区间；涨幅强度得分 100.0；量能结构得分 100.0",
+      "stop": 23.61,
+      "maxPosition": "单票不超过计划资金的12%，只在买入区间内分批"
+    }
+  ]
+}

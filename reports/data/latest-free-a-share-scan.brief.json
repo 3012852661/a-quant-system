@@ -1,0 +1,914 @@
+{
+  "requestTime": "2026-06-16T10:55:08",
+  "marketState": {
+    "status": "ACTIVE",
+    "score": 8,
+    "note": "选股同步已完成，仍需结合盘中承接与风控确认。"
+  },
+  "strongNotLimit": [
+    {
+      "code": "301120",
+      "name": "新特电气",
+      "pct": 5.68,
+      "price": 20.11,
+      "turnover": 6.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "003031",
+      "name": "中瓷电子",
+      "pct": 5.21,
+      "price": 158.3,
+      "turnover": 3.22,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600973",
+      "name": "宝胜股份",
+      "pct": 4.87,
+      "price": 6.89,
+      "turnover": 3.66,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603690",
+      "name": "至纯科技",
+      "pct": 4.65,
+      "price": 28.79,
+      "turnover": 6.24,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "pct": 4.22,
+      "price": 89.21,
+      "turnover": 4.93,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "000600",
+      "name": "建投能源",
+      "pct": 4.49,
+      "price": 10.7,
+      "turnover": 3.79,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002350",
+      "name": "北京科锐",
+      "pct": 6.02,
+      "price": 16.38,
+      "turnover": 3.12,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300302",
+      "name": "同有科技",
+      "pct": 5.57,
+      "price": 48.56,
+      "turnover": 9.94,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002183",
+      "name": "怡 亚 通",
+      "pct": 5.16,
+      "price": 5.71,
+      "turnover": 3.85,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "pct": 5.15,
+      "price": 24.72,
+      "turnover": 5.01,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002185",
+      "name": "华天科技",
+      "pct": 4.5,
+      "price": 17.9,
+      "turnover": 6.32,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "pct": 5.26,
+      "price": 81.45,
+      "turnover": 5.47,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300121",
+      "name": "阳谷华泰",
+      "pct": 4.29,
+      "price": 11.92,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603315",
+      "name": "福鞍股份",
+      "pct": 5.16,
+      "price": 17.13,
+      "turnover": 3.57,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301218",
+      "name": "华是科技",
+      "pct": 4.06,
+      "price": 44.81,
+      "turnover": 8.49,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002965",
+      "name": "祥鑫科技",
+      "pct": 5.26,
+      "price": 42.6,
+      "turnover": 7.0,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002167",
+      "name": "东方锆业",
+      "pct": 4.14,
+      "price": 15.36,
+      "turnover": 8.97,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "001326",
+      "name": "联域股份",
+      "pct": 5.04,
+      "price": 68.33,
+      "turnover": 3.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301489",
+      "name": "思泉新材",
+      "pct": 4.39,
+      "price": 152.41,
+      "turnover": 6.28,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301261",
+      "name": "恒工精密",
+      "pct": 4.31,
+      "price": 88.65,
+      "turnover": 5.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603678",
+      "name": "火炬电子",
+      "pct": 6.14,
+      "price": 67.9,
+      "turnover": 7.43,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "688662",
+      "name": "富信科技",
+      "pct": 4.82,
+      "price": 122.5,
+      "turnover": 8.67,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300751",
+      "name": "迈为股份",
+      "pct": 5.85,
+      "price": 226.0,
+      "turnover": 3.96,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002036",
+      "name": "联创电子",
+      "pct": 5.4,
+      "price": 8.59,
+      "turnover": 3.37,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "688766",
+      "name": "普冉股份",
+      "pct": 4.79,
+      "price": 478.88,
+      "turnover": 3.68,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300903",
+      "name": "科翔股份",
+      "pct": 5.84,
+      "price": 82.79,
+      "turnover": 4.89,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600345",
+      "name": "长江通信",
+      "pct": 5.91,
+      "price": 63.3,
+      "turnover": 7.54,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300395",
+      "name": "菲利华",
+      "pct": 4.3,
+      "price": 132.79,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600360",
+      "name": "华微电子",
+      "pct": 4.26,
+      "price": 11.74,
+      "turnover": 4.3,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300568",
+      "name": "星源材质",
+      "pct": 4.65,
+      "price": 19.57,
+      "turnover": 7.43,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    }
+  ],
+  "watch": [
+    {
+      "code": "301120",
+      "name": "新特电气",
+      "pct": 5.68,
+      "price": 20.11,
+      "turnover": 6.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "003031",
+      "name": "中瓷电子",
+      "pct": 5.21,
+      "price": 158.3,
+      "turnover": 3.22,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600973",
+      "name": "宝胜股份",
+      "pct": 4.87,
+      "price": 6.89,
+      "turnover": 3.66,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603690",
+      "name": "至纯科技",
+      "pct": 4.65,
+      "price": 28.79,
+      "turnover": 6.24,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "pct": 4.22,
+      "price": 89.21,
+      "turnover": 4.93,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "000600",
+      "name": "建投能源",
+      "pct": 4.49,
+      "price": 10.7,
+      "turnover": 3.79,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002350",
+      "name": "北京科锐",
+      "pct": 6.02,
+      "price": 16.38,
+      "turnover": 3.12,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300302",
+      "name": "同有科技",
+      "pct": 5.57,
+      "price": 48.56,
+      "turnover": 9.94,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002183",
+      "name": "怡 亚 通",
+      "pct": 5.16,
+      "price": 5.71,
+      "turnover": 3.85,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "pct": 5.15,
+      "price": 24.72,
+      "turnover": 5.01,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002185",
+      "name": "华天科技",
+      "pct": 4.5,
+      "price": 17.9,
+      "turnover": 6.32,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "pct": 5.26,
+      "price": 81.45,
+      "turnover": 5.47,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300121",
+      "name": "阳谷华泰",
+      "pct": 4.29,
+      "price": 11.92,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603315",
+      "name": "福鞍股份",
+      "pct": 5.16,
+      "price": 17.13,
+      "turnover": 3.57,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301218",
+      "name": "华是科技",
+      "pct": 4.06,
+      "price": 44.81,
+      "turnover": 8.49,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002965",
+      "name": "祥鑫科技",
+      "pct": 5.26,
+      "price": 42.6,
+      "turnover": 7.0,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002167",
+      "name": "东方锆业",
+      "pct": 4.14,
+      "price": 15.36,
+      "turnover": 8.97,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "001326",
+      "name": "联域股份",
+      "pct": 5.04,
+      "price": 68.33,
+      "turnover": 3.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301489",
+      "name": "思泉新材",
+      "pct": 4.39,
+      "price": 152.41,
+      "turnover": 6.28,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301261",
+      "name": "恒工精密",
+      "pct": 4.31,
+      "price": 88.65,
+      "turnover": 5.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603678",
+      "name": "火炬电子",
+      "pct": 6.14,
+      "price": 67.9,
+      "turnover": 7.43,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "688662",
+      "name": "富信科技",
+      "pct": 4.82,
+      "price": 122.5,
+      "turnover": 8.67,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300751",
+      "name": "迈为股份",
+      "pct": 5.85,
+      "price": 226.0,
+      "turnover": 3.96,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002036",
+      "name": "联创电子",
+      "pct": 5.4,
+      "price": 8.59,
+      "turnover": 3.37,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "688766",
+      "name": "普冉股份",
+      "pct": 4.79,
+      "price": 478.88,
+      "turnover": 3.68,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300903",
+      "name": "科翔股份",
+      "pct": 5.84,
+      "price": 82.79,
+      "turnover": 4.89,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600345",
+      "name": "长江通信",
+      "pct": 5.91,
+      "price": 63.3,
+      "turnover": 7.54,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300395",
+      "name": "菲利华",
+      "pct": 4.3,
+      "price": 132.79,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600360",
+      "name": "华微电子",
+      "pct": 4.26,
+      "price": 11.74,
+      "turnover": 4.3,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300568",
+      "name": "星源材质",
+      "pct": 4.65,
+      "price": 19.57,
+      "turnover": 7.43,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    }
+  ],
+  "selected": [
+    {
+      "code": "301120",
+      "name": "新特电气",
+      "pct": 5.68,
+      "price": 20.11,
+      "turnover": 6.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "003031",
+      "name": "中瓷电子",
+      "pct": 5.21,
+      "price": 158.3,
+      "turnover": 3.22,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600973",
+      "name": "宝胜股份",
+      "pct": 4.87,
+      "price": 6.89,
+      "turnover": 3.66,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603690",
+      "name": "至纯科技",
+      "pct": 4.65,
+      "price": 28.79,
+      "turnover": 6.24,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "pct": 4.22,
+      "price": 89.21,
+      "turnover": 4.93,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "000600",
+      "name": "建投能源",
+      "pct": 4.49,
+      "price": 10.7,
+      "turnover": 3.79,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002350",
+      "name": "北京科锐",
+      "pct": 6.02,
+      "price": 16.38,
+      "turnover": 3.12,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300302",
+      "name": "同有科技",
+      "pct": 5.57,
+      "price": 48.56,
+      "turnover": 9.94,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002183",
+      "name": "怡 亚 通",
+      "pct": 5.16,
+      "price": 5.71,
+      "turnover": 3.85,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "pct": 5.15,
+      "price": 24.72,
+      "turnover": 5.01,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002185",
+      "name": "华天科技",
+      "pct": 4.5,
+      "price": 17.9,
+      "turnover": 6.32,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "pct": 5.26,
+      "price": 81.45,
+      "turnover": 5.47,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300121",
+      "name": "阳谷华泰",
+      "pct": 4.29,
+      "price": 11.92,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603315",
+      "name": "福鞍股份",
+      "pct": 5.16,
+      "price": 17.13,
+      "turnover": 3.57,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301218",
+      "name": "华是科技",
+      "pct": 4.06,
+      "price": 44.81,
+      "turnover": 8.49,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002965",
+      "name": "祥鑫科技",
+      "pct": 5.26,
+      "price": 42.6,
+      "turnover": 7.0,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002167",
+      "name": "东方锆业",
+      "pct": 4.14,
+      "price": 15.36,
+      "turnover": 8.97,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "001326",
+      "name": "联域股份",
+      "pct": 5.04,
+      "price": 68.33,
+      "turnover": 3.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301489",
+      "name": "思泉新材",
+      "pct": 4.39,
+      "price": 152.41,
+      "turnover": 6.28,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "301261",
+      "name": "恒工精密",
+      "pct": 4.31,
+      "price": 88.65,
+      "turnover": 5.38,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "603678",
+      "name": "火炬电子",
+      "pct": 6.14,
+      "price": 67.9,
+      "turnover": 7.43,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "688662",
+      "name": "富信科技",
+      "pct": 4.82,
+      "price": 122.5,
+      "turnover": 8.67,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300751",
+      "name": "迈为股份",
+      "pct": 5.85,
+      "price": 226.0,
+      "turnover": 3.96,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "002036",
+      "name": "联创电子",
+      "pct": 5.4,
+      "price": 8.59,
+      "turnover": 3.37,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "688766",
+      "name": "普冉股份",
+      "pct": 4.79,
+      "price": 478.88,
+      "turnover": 3.68,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300903",
+      "name": "科翔股份",
+      "pct": 5.84,
+      "price": 82.79,
+      "turnover": 4.89,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600345",
+      "name": "长江通信",
+      "pct": 5.91,
+      "price": 63.3,
+      "turnover": 7.54,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300395",
+      "name": "菲利华",
+      "pct": 4.3,
+      "price": 132.79,
+      "turnover": 5.46,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "600360",
+      "name": "华微电子",
+      "pct": 4.26,
+      "price": 11.74,
+      "turnover": 4.3,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    },
+    {
+      "code": "300568",
+      "name": "星源材质",
+      "pct": 4.65,
+      "price": 19.57,
+      "turnover": 7.43,
+      "amount": 0,
+      "mainNet": 0,
+      "industry": ""
+    }
+  ]
+}

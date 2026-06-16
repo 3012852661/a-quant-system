@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>A股量化选股系统</title>
+    <style>
+      :root {
+        --bg: #f5f6f8;
+        --panel: #ffffff;
+        --line: #d9dee7;
+        --text: #141922;
+        --muted: #667085;
+        --red: #c93636;
+        --green: #0d8060;
+        --amber: #9d6500;
+        --blue: #2557a7;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      .shell {
+        width: min(1440px, 100%);
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0 0 6px;
+        font-size: 26px;
+        letter-spacing: 0;
+      }
+
+      .sub {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .btn {
+        height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--panel);
+        color: var(--text);
+        padding: 0 12px;
+        cursor: pointer;
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .metric {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .metric strong {
+        font-size: 28px;
+      }
+
+      .tableWrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+      }
+
+      table {
+        width: 100%;
+        min-width: 1120px;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+        font-size: 14px;
+      }
+
+      th {
+        background: #eef1f5;
+        color: #384152;
+        font-size: 12px;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+
+      .up {
+        color: var(--red);
+        font-weight: 700;
+      }
+
+      .score,
+      .risk {
+        display: inline-flex;
+        min-width: 44px;
+        height: 26px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-weight: 700;
+      }
+
+      .score {
+        color: var(--blue);
+        background: #e9effb;
+      }
+
+      .risk.low {
+        color: var(--green);
+        background: #e7f5ef;
+      }
+
+      .risk.mid {
+        color: var(--amber);
+        background: #fff3df;
+      }
+
+      .risk.high {
+        color: var(--red);
+        background: #fdeaea;
+      }
+
+      .comment {
+        min-width: 340px;
+        line-height: 1.55;
+      }
+
+      .empty {
+        height: 160px;
+        color: var(--muted);
+        text-align: center;
+        vertical-align: middle;
+      }
+
+      @media (max-width: 760px) {
+        .shell {
+          padding: 16px;
+        }
+
+        .topbar {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .metrics {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>A股量化选股系统</h1>
+          <p class="sub" id="runInfo">读取选股结果中...</p>
+        </div>
+        <button class="btn" type="button" onclick="location.reload()">刷新</button>
+      </header>
+
+      <section class="metrics">
+        <div class="metric"><span>入池数量</span><strong id="count">-</strong></div>
+        <div class="metric"><span>平均评分</span><strong id="avgScore">-</strong></div>
+        <div class="metric"><span>高风险</span><strong id="highRisk">-</strong></div>
+        <div class="metric"><span>低风险</span><strong id="lowRisk">-</strong></div>
+      </section>
+
+      <section class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>代码</th>
+              <th>名称</th>
+              <th>当前价格</th>
+              <th>涨幅</th>
+              <th>量能放大</th>
+              <th>趋势评分</th>
+              <th>风险等级</th>
+              <th>AI点评</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr><td class="empty" colspan="8">加载中</td></tr>
+          </tbody>
+        </table>
+      </section>
+    </main>
+
+    <script>
+      const riskClass = { 低: "low", 中: "mid", 高: "high" };
+
+      function cell(text, className = "") {
+        const td = document.createElement("td");
+        td.className = className;
+        td.textContent = text;
+        return td;
+      }
+
+      async function main() {
+        const response = await fetch("backend/data/stock_pool_latest.json", { cache: "no-store" });
+        const data = await response.json();
+        const signals = data.signals || [];
+        document.getElementById("runInfo").textContent = `运行时间：${data.run_at || "-"}；数据源：${data.input || "-"}`;
+        document.getElementById("count").textContent = signals.length;
+        document.getElementById("avgScore").textContent = signals.length
+          ? (signals.reduce((sum, item) => sum + Number(item.score || item.trend_score || 0), 0) / signals.length).toFixed(1)
+          : "-";
+        document.getElementById("highRisk").textContent = signals.filter((item) => item.risk_level === "高").length;
+        document.getElementById("lowRisk").textContent = signals.filter((item) => item.risk_level === "低").length;
+
+        const body = document.getElementById("rows");
+        body.replaceChildren();
+        if (!signals.length) {
+          const row = document.createElement("tr");
+          row.innerHTML = '<td class="empty" colspan="8">暂无入池信号</td>';
+          body.appendChild(row);
+          return;
+        }
+
+        for (const item of signals) {
+          const tr = document.createElement("tr");
+          tr.appendChild(cell(item.code, "mono"));
+          tr.appendChild(cell(item.name));
+          tr.appendChild(cell(Number(item.current_price || 0).toFixed(2)));
+          tr.appendChild(cell(`${Number(item.pct_chg || item.pct || 0).toFixed(2)}%`, "up"));
+          tr.appendChild(cell(`${Number(item.volume_ratio || 0).toFixed(2)}x`));
+
+          const scoreTd = document.createElement("td");
+          scoreTd.innerHTML = `<span class="score">${Number(item.score || item.trend_score || 0).toFixed(1)}</span>`;
+          tr.appendChild(scoreTd);
+
+          const riskTd = document.createElement("td");
+          riskTd.innerHTML = `<span class="risk ${riskClass[item.risk_level] || "mid"}">${item.risk_level || "-"}</span>`;
+          tr.appendChild(riskTd);
+
+          tr.appendChild(cell(item.ai_comment || "-", "comment"));
+          body.appendChild(tr);
+        }
+      }
+
+      main().catch((error) => {
+        document.getElementById("runInfo").textContent = `加载失败：${error.message}`;
+      });
+    </script>
+  </body>
+</html>

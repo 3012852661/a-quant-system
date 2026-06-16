@@ -1,0 +1,13 @@
+.venv/
+.venv*/
+__pycache__/
+*.py[cod]
+.next/
+.next.broken*/
+node_modules/
+dist/
+.env
+.env.*
+*.db
+*.sqlite
+*.sqlite3

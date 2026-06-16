@@ -1,0 +1,11 @@
+{
+  "generatedAt": "2026-06-16T10:55:08",
+  "metrics": {
+    "buyCount": 30,
+    "closedTrades": 0,
+    "winRatePct": null,
+    "averageReturnPct": null,
+    "maxDrawdownPct": null
+  },
+  "note": "当前同步只生成候选池；回测需要未来 K 线缓存后再更新。"
+}

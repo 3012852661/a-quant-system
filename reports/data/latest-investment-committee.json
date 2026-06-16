@@ -1,0 +1,2939 @@
+{
+  "generatedAt": "2026-06-16T11:34:48",
+  "source": {
+    "stockPool": "quant-system/backend/data/stock_pool_latest.json",
+    "liveQuotes": "reports/data/live-tencent-candidate-quotes.json"
+  },
+  "method": "Six-role committee: researcher, fundamental, technical, sentiment, risk, portfolio manager",
+  "decisions": [
+    {
+      "code": "301120",
+      "name": "新特电气",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 20.24，涨跌幅 6.36%，时间 20260616113415",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 75.52 亿",
+            "换手率 7.22%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 6.36%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：6.36%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：7.22%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 19.21，目标位 21.72，买区 19.87-20.03"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "003031",
+      "name": "中瓷电子",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 160.99，涨跌幅 7%，时间 20260616113412",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 726.15 亿",
+            "换手率 3.86%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 7.00%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：7.00%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：3.86%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 151.18，目标位 170.96，买区 156.40-157.64"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "600973",
+      "name": "宝胜股份",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 6.84，涨跌幅 4.11%，时间 20260616113417",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 93.80 亿",
+            "换手率 3.97%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.11%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.11%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：3.97%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 6.58，目标位 7.44，买区 6.81-6.86"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "603690",
+      "name": "至纯科技",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 28.94，涨跌幅 5.2%，时间 20260616113415",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 110.83 亿",
+            "换手率 6.76%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.20%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.20%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：6.76%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 27.49，目标位 31.09，买区 28.44-28.67"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "603026",
+      "name": "石大胜华",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 90.94，涨跌幅 6.24%，时间 20260616113418",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 211.62 亿",
+            "换手率 6.57%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 6.24%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：6.24%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：6.57%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 85.2，目标位 96.35，买区 88.14-88.84"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "000600",
+      "name": "建投能源",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 10.64，涨跌幅 3.91%，时间 20260616113412",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 191.86 亿",
+            "换手率 4.20%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 3.91%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：3.91%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.20%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 10.22，目标位 11.56，买区 10.57-10.66"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "002350",
+      "name": "北京科锐",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 16.43，涨跌幅 6.34%，时间 20260616113430",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 89.11 亿",
+            "换手率 3.46%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 6.34%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：6.34%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：3.46%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 15.48，目标位 17.44，买区 16.09-16.28"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300302",
+      "name": "同有科技",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 48.7，涨跌幅 5.87%，时间 20260616113345",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 233.40 亿",
+            "换手率 11.07%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.87%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.87%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：11.07%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 46.37，目标位 52.44，买区 47.98-48.36"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "002183",
+      "name": "怡 亚 通",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 5.68，涨跌幅 4.6%，时间 20260616113357",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 147.51 亿",
+            "换手率 4.15%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.60%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.60%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.15%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 5.45，目标位 6.17，买区 5.64-5.69"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "603032",
+      "name": "德新科技",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 24.95，涨跌幅 6.13%，时间 20260616113426",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 58.19 亿",
+            "换手率 5.77%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 6.13%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：6.13%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：5.77%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 23.61，目标位 26.7，买区 24.42-24.62"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "002185",
+      "name": "华天科技",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 17.97，涨跌幅 4.9%，时间 20260616113403",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 597.22 亿",
+            "换手率 6.93%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.90%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.90%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：6.93%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 17.09，目标位 19.33，买区 17.69-17.82"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300037",
+      "name": "新宙邦",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 81.53，涨跌幅 5.36%，时间 20260616113403",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 614.64 亿",
+            "换手率 6.14%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.36%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.36%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：6.14%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 77.78，目标位 87.97，买区 80.47-81.11"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "603315",
+      "name": "福鞍股份",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 17.18，涨跌幅 5.46%，时间 20260616113410",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 55.04 亿",
+            "换手率 4.17%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.46%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.46%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.17%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 16.36，目标位 18.5，买区 16.92-17.06"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "301218",
+      "name": "华是科技",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 44.68，涨跌幅 3.76%，时间 20260616113354",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 50.95 亿",
+            "换手率 9.09%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 3.76%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：3.76%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：9.09%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 42.79，目标位 48.39，买区 44.27-44.62"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "002965",
+      "name": "祥鑫科技",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 42.64，涨跌幅 5.36%，时间 20260616113357",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 113.16 亿",
+            "换手率 7.68%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.36%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.36%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：7.68%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 40.68，目标位 46.01，买区 42.09-42.42"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "002167",
+      "name": "东方锆业",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 15.39，涨跌幅 4.34%，时间 20260616113427",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 119.22 亿",
+            "换手率 10.21%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.34%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.34%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：10.21%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 14.67，目标位 16.59，买区 15.18-15.30"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "001326",
+      "name": "联域股份",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 68.09，涨跌幅 4.67%，时间 20260616113351",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 49.84 亿",
+            "换手率 3.64%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.67%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.67%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：3.64%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 65.26，目标位 73.8，买区 67.51-68.04"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "301489",
+      "name": "思泉新材",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 153.14，涨跌幅 4.89%，时间 20260616113357",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 173.13 亿",
+            "换手率 8.35%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.89%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.89%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：8.35%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 145.55，目标位 164.6，买区 150.58-151.77"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "301261",
+      "name": "恒工精密",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 87.89，涨跌幅 3.41%，时间 20260616113424",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 77.25 亿",
+            "换手率 5.82%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 3.41%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：3.41%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：5.82%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 84.66，目标位 95.74，买区 87.59-88.28"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "603678",
+      "name": "火炬电子",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 67.85，涨跌幅 6.07%，时间 20260616113427",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 322.67 亿",
+            "换手率 7.95%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 6.07%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：6.07%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：7.95%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 64.17，目标位 72.31，买区 66.68-67.47"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300751",
+      "name": "迈为股份",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 224.64，涨跌幅 5.22%，时间 20260616113357",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 626.52 亿",
+            "换手率 4.40%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.22%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.22%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.40%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 213.57，目标位 240.69，买区 221.93-224.58"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "002036",
+      "name": "联创电子",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 8.6，涨跌幅 5.52%，时间 20260616113430",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 90.95 亿",
+            "换手率 4.13%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.52%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.52%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.13%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 8.2，目标位 9.28，买区 8.49-8.55"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300903",
+      "name": "科翔股份",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 81.37，涨跌幅 4.03%，时间 20260616113430",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 354.27 亿",
+            "换手率 5.80%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.03%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.03%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：5.80%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 78.24，目标位 88.17，买区 81.30-82.27"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "600345",
+      "name": "长江通信",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 63.52，涨跌幅 6.27%，时间 20260616113426",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 209.37 亿",
+            "换手率 8.49%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 6.27%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：6.27%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：8.49%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 59.82，目标位 67.41，买区 62.16-62.90"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300395",
+      "name": "菲利华",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 132.61，涨跌幅 4.15%，时间 20260616113436",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 697.17 亿",
+            "换手率 6.30%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 4.15%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：4.15%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：6.30%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 126.81，目标位 143.41，买区 131.20-132.23"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "600360",
+      "name": "华微电子",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 11.7，涨跌幅 3.91%，时间 20260616113410",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 112.35 亿",
+            "换手率 4.67%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 3.91%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：3.91%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.67%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 11.21，目标位 12.68，买区 11.60-11.69"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300568",
+      "name": "星源材质",
+      "decision": "WATCH_ONLY",
+      "confidence": 66.1,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 96.5，状态 STRONG",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 CAUTION"
+      ],
+      "vetoes": [],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 19.71，涨跌幅 5.4%，时间 20260616113436",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 265.24 亿",
+            "换手率 8.40%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "STRONG",
+          "score": 96.48,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 5.40%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：5.40%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：8.40%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "CAUTION",
+          "score": 68,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 18.69，目标位 21.14，买区 19.34-19.49"
+          ],
+          "risks": [
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "300121",
+      "name": "阳谷华泰",
+      "decision": "REJECT",
+      "confidence": 48.6,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 61.5，状态 MIXED",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 VETO"
+      ],
+      "vetoes": [
+        "最新涨幅不在策略强势区间"
+      ],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 11.77，涨跌幅 2.97%，时间 20260616113418",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 52.40 亿",
+            "换手率 6.01%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "MIXED",
+          "score": 61.480000000000004,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 2.97%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [
+            "最新涨幅已离开 3%-7% 强势区间"
+          ],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：2.97%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：6.01%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "VETO",
+          "score": 33,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 11.38，目标位 12.87，买区 11.78-11.87"
+          ],
+          "risks": [
+            "最新涨幅不在策略强势区间",
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "688662",
+      "name": "富信科技",
+      "decision": "REJECT",
+      "confidence": 46.6,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 61.5，状态 MIXED",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 VETO"
+      ],
+      "vetoes": [
+        "最新涨幅不在策略强势区间",
+        "价格显著高于原买入区，追高风险"
+      ],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 125.3，涨跌幅 7.21%，时间 20260616113416",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 143.73 亿",
+            "换手率 9.87%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "MIXED",
+          "score": 61.480000000000004,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 7.21%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [
+            "最新涨幅已离开 3%-7% 强势区间"
+          ],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：7.21%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：9.87%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "VETO",
+          "score": 25,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 116.99，目标位 132.3，买区 121.03-121.99"
+          ],
+          "risks": [
+            "最新涨幅不在策略强势区间",
+            "价格显著高于原买入区，追高风险",
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    },
+    {
+      "code": "688766",
+      "name": "普冉股份",
+      "decision": "REJECT",
+      "confidence": 46.6,
+      "max_position_pct": 0.0,
+      "rationale": [
+        "技术评分 61.5，状态 MIXED",
+        "基本面评分 50.0，状态 NEEDS_MORE_DATA",
+        "情绪评分 50.0，状态 NEUTRAL",
+        "风险状态 VETO"
+      ],
+      "vetoes": [
+        "最新涨幅不在策略强势区间",
+        "价格显著高于原买入区，追高风险"
+      ],
+      "role_reports": {
+        "Researcher": {
+          "role": "Researcher",
+          "stance": "FACTS_ONLY",
+          "score": 50,
+          "summary": "已聚合本地候选池与最新候选报价；不输出投资判断。",
+          "evidence": [
+            "候选池生成时间：2026-06-16",
+            "原始动作：TRADE，原始评分：96.48",
+            "最新价 489.1，涨跌幅 7.02%，时间 20260616113418",
+            "日内高低 None / None，成交额约 0.00 亿"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "公告、财报、研报、行业新闻源尚未接入自动采集"
+          ]
+        },
+        "Fundamental Analyst": {
+          "role": "Fundamental Analyst",
+          "stance": "NEEDS_MORE_DATA",
+          "score": 50.0,
+          "summary": "只能基于估值、市值和流动性做初筛，不能确认基本面改善。",
+          "evidence": [
+            "PE 缺失",
+            "总市值约 724.11 亿",
+            "换手率 4.14%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "收入结构、毛利率、现金流、近三期利润增速未接入结构化数据"
+          ]
+        },
+        "Technical Analyst": {
+          "role": "Technical Analyst",
+          "stance": "MIXED",
+          "score": 61.480000000000004,
+          "summary": "技术面以最新涨幅、日内承接、回撤和均线/量能为核心约束。",
+          "evidence": [
+            "K 线缓存缺失，使用日内行情做降级判断",
+            "最新涨跌幅 7.02%",
+            "相对开盘 0.00%",
+            "距日内高点回撤 0.00%",
+            "日内低点缺失"
+          ],
+          "risks": [
+            "最新涨幅已离开 3%-7% 强势区间"
+          ],
+          "data_gaps": [
+            "K 线缓存缺失，MACD/KDJ 暂未计算"
+          ]
+        },
+        "Sentiment Analyst": {
+          "role": "Sentiment Analyst",
+          "stance": "NEUTRAL",
+          "score": 50.0,
+          "summary": "当前舆情模块只使用价格/成交热度代理，不把社交情绪缺失误判为利好。",
+          "evidence": [
+            "涨跌幅热度代理：7.02%",
+            "成交额热度代理：0.00 亿",
+            "换手率热度代理：4.14%"
+          ],
+          "risks": [],
+          "data_gaps": [
+            "新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ]
+        },
+        "Risk Officer": {
+          "role": "Risk Officer",
+          "stance": "VETO",
+          "score": 25,
+          "summary": "风险官只寻找反面证据；存在否决项时禁止新开仓。",
+          "evidence": [
+            "止损线 457.33，目标位 517.19，买区 473.13-476.87"
+          ],
+          "risks": [
+            "最新涨幅不在策略强势区间",
+            "价格显著高于原买入区，追高风险",
+            "Researcher 数据缺口：公告、财报、研报、行业新闻源尚未接入自动采集",
+            "Fundamental Analyst 数据缺口：收入结构、毛利率、现金流、近三期利润增速未接入结构化数据",
+            "Technical Analyst 数据缺口：K 线缓存缺失，MACD/KDJ 暂未计算",
+            "Sentiment Analyst 数据缺口：新闻评论、社交平台讨论、财经社区情绪尚未接入"
+          ],
+          "data_gaps": [
+            "监管、诉讼、减持、解禁、业绩预告风险尚未接入结构化源"
+          ]
+        }
+      }
+    }
+  ]
+}
