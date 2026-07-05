@@ -26,6 +26,7 @@ def render_markdown(payload: dict[str, Any]) -> str:
         "",
         f"- 生成时间：{payload.get('generatedAt')}",
         f"- 方法：{payload.get('method')}",
+        f"- 知识库：{payload.get('source', {}).get('knowledge', 'quant-system/knowledge')}",
         "",
         "## 投资经理结论",
         "",
@@ -93,4 +94,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

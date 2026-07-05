@@ -19,6 +19,7 @@ class StockQuote(BaseModel):
     market_cap: float | None = None
     main_net: float | None = None
     industry: str | None = None
+    quote_time: int | str | None = None
 
 
 class FinancialSnapshot(BaseModel):
@@ -53,6 +54,16 @@ class MoneyFlow(BaseModel):
     medium_net: float | None = None
     small_net: float | None = None
     source: str = "eastmoney"
+
+
+class NewsItem(BaseModel):
+    title: str
+    summary: str | None = None
+    published_at: str | None = None
+    url: str | None = None
+    symbols: list[str] = Field(default_factory=list)
+    source: str = "news"
+    category: str | None = None
 
 
 class KLine(BaseModel):

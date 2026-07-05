@@ -1,0 +1,13 @@
+.env
+.env.*
+!.env.example
+.next
+.next*
+tsconfig.tsbuildinfo
+node_modules
+npm-debug.log*
+.DS_Store
+*.log
+../data/quant.db
+../../reports/data/kline-cache
+../../reports/data/*.raw

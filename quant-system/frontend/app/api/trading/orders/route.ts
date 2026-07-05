@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { placeOrder } from "../../../../lib/local-data";
+import { requireAllowedUserResponse } from "../../../../lib/access-control";
+import { isPublicReadOnly, placeOrder } from "../../../../lib/local-data";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
+  const blocked = await requireAllowedUserResponse();
+  if (blocked) return blocked;
+  if (isPublicReadOnly()) {
+    return NextResponse.json(
+      { ok: false, detail: "公开部署为只读模式，禁止提交委托" },
+      { status: 403 },
+    );
+  }
   const payload = await request.json();
   return NextResponse.json(
     placeOrder({

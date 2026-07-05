@@ -1,13 +1,15 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from backend.agent_gateway import agent_capabilities, append_agent_audit
 from backend.ai.commentary import enrich_with_openai
 from backend.backtest.simple_backtest import run_hold_days_backtest
 from backend.config import settings
@@ -16,12 +18,21 @@ from backend.data.providers import (
     CninfoAnnouncementProvider,
     EastMoneyMoneyFlowProvider,
     ProviderUnavailable,
+    ReportFallbackProvider,
     TushareProvider,
     data_source_status,
     get_provider,
 )
+from backend.execution.audit import append_execution_audit
+from backend.execution.paper import (
+    apply_paper_order,
+    default_trade_state as paper_default_trade_state,
+    equity_of as paper_equity_of,
+    normalize_position as paper_normalize_position,
+)
 from backend.risk.portfolio import order_risk_reasons, portfolio_snapshot
 from backend.scheduler.jobs import create_scheduler, run_daily_selection
+from backend.strategy.registry import build_strategy_registry
 from backend.strategy.trend_breakout import run_trend_breakout
 
 app = FastAPI(title="A股量化选股系统", version="0.1.0")
@@ -33,6 +44,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MAX_INTRADAY_QUOTE_AGE_MINUTES = 2
+MAX_PRICE_DIVERGENCE_PCT = 0.5
+
 
 class OrderRequest(BaseModel):
     side: str = Field(pattern="^(BUY|SELL)$")
@@ -43,15 +57,18 @@ class OrderRequest(BaseModel):
     dryRun: bool = False
 
 
+class AgentPreflightRequest(BaseModel):
+    side: str = Field(pattern="^(BUY|SELL)$")
+    code: str
+    name: str | None = None
+    quantity: int = Field(gt=0)
+    price: float | None = Field(default=None, gt=0)
+    strategyKey: str | None = None
+    rationale: str | None = None
+
+
 def default_trade_state() -> dict:
-    return {
-        "mode": "PAPER",
-        "cash": 100000.0,
-        "initialCash": 100000.0,
-        "positions": [],
-        "orders": [],
-        "trades": [],
-    }
+    return paper_default_trade_state()
 
 if settings.enable_scheduler:
     scheduler = create_scheduler()
@@ -74,6 +91,7 @@ def health() -> dict:
 def data_sources() -> dict:
     return {
         "primaryProvider": settings.data_provider,
+        "allowReportFallback": settings.allow_report_fallback,
         "stack": settings.data_source_stack,
         "sources": data_source_status(),
         "storage": {
@@ -105,7 +123,10 @@ def write_json_report(relative_path: str, payload: Any) -> None:
 
 def latest_rows() -> list[dict]:
     scan = read_json_report("reports/data/latest-free-a-share-scan.brief.json", {})
+    live_quotes = read_json_report("reports/data/live-tencent-candidate-quotes.json", {})
     rows: list[dict] = []
+    if isinstance(live_quotes.get("rows"), list):
+        rows.extend(live_quotes["rows"])
     for key in ("newLimitUps", "strongToLimit", "newStrong"):
         rows.extend(read_json_report("reports/data/latest-open-limit-watch.json", {}).get(key, []))
     for key in ("limitUpPool", "strongNotLimit", "fundTop", "attack", "watch", "avoid"):
@@ -127,6 +148,43 @@ def latest_quote(code: str) -> dict | None:
     return next((row for row in latest_rows() if str(row.get("code", "")).zfill(6) == normalized), None)
 
 
+def tencent_time(value: Any) -> str:
+    text = str(value or "")
+    if len(text) == 14 and text.isdigit():
+        return f"{text[0:4]}-{text[4:6]}-{text[6:8]}T{text[8:10]}:{text[10:12]}:{text[12:14]}+08:00"
+    return ""
+
+
+def shanghai_minutes_now() -> int:
+    now = datetime.now(timezone.utc).astimezone()
+    return now.hour * 60 + now.minute
+
+
+def is_a_share_trading_time() -> bool:
+    minutes = shanghai_minutes_now()
+    return (9 * 60 + 30 <= minutes <= 11 * 60 + 30) or (13 * 60 <= minutes <= 15 * 60)
+
+
+def minutes_since(value: Any) -> float:
+    text = str(value or "")
+    if not text:
+        return float("inf")
+    try:
+        parsed = datetime.fromisoformat(text)
+    except ValueError:
+        converted = tencent_time(text)
+        if not converted:
+            return float("inf")
+        parsed = datetime.fromisoformat(converted)
+    return max(0.0, (datetime.now(timezone.utc) - parsed.astimezone(timezone.utc)).total_seconds() / 60)
+
+
+def latest_live_quote_time() -> str:
+    live_quotes = read_json_report("reports/data/live-tencent-candidate-quotes.json", {})
+    times = [tencent_time(row.get("time")) for row in live_quotes.get("rows", []) if tencent_time(row.get("time"))]
+    return sorted(times)[-1] if times else ""
+
+
 def trade_state() -> dict:
     state = read_json_report("reports/data/trade-ops-state.json", default_trade_state())
     base = default_trade_state()
@@ -135,23 +193,11 @@ def trade_state() -> dict:
 
 
 def normalize_position(position: dict) -> dict:
-    quote = latest_quote(position["code"])
-    last_price = float(quote.get("price") or position.get("lastPrice") or position["avgPrice"]) if quote else float(
-        position.get("lastPrice") or position["avgPrice"]
-    )
-    market_value = last_price * int(position["quantity"])
-    cost = float(position["avgPrice"]) * int(position["quantity"])
-    return {
-        **position,
-        "lastPrice": round(last_price, 3),
-        "marketValue": round(market_value, 2),
-        "unrealizedPct": round((market_value / cost - 1) * 100, 2) if cost > 0 else 0,
-    }
+    return paper_normalize_position(position, latest_quote)
 
 
 def equity_of(state: dict) -> float:
-    positions = [normalize_position(position) for position in state.get("positions", [])]
-    return round(float(state.get("cash", 0)) + sum(float(item["marketValue"]) for item in positions), 2)
+    return paper_equity_of(state, latest_quote)
 
 
 def trade_gate_reasons(order: OrderRequest, state: dict, recommendation: dict) -> list[str]:
@@ -161,9 +207,21 @@ def trade_gate_reasons(order: OrderRequest, state: dict, recommendation: dict) -
     quote_price = float(quote.get("price") or 0)
     price = float(order.price or quote_price or 0)
     positions = [normalize_position(position) for position in state.get("positions", [])]
+    refresh_report = read_json_report("reports/data/latest-refresh-report.json", {})
+    latest_live_time = latest_live_quote_time()
     if order.quantity % 100 != 0:
         reasons.append("A股委托数量必须为100股整数倍")
     if order.side == "BUY":
+        if refresh_report.get("warning"):
+            reasons.append("最近一次刷新存在数据源警告，禁止新增买入")
+        if refresh_report.get("ok") is False or refresh_report.get("criticalFailures"):
+            reasons.append("最近一次刷新存在关键失败，禁止新增买入")
+        if not quote:
+            reasons.append("缺少该标的今日实时行情，禁止新增买入")
+        if latest_live_time and is_a_share_trading_time():
+            quote_age = minutes_since(latest_live_time)
+            if quote_age > MAX_INTRADAY_QUOTE_AGE_MINUTES:
+                reasons.append(f"盘中行情已 {quote_age:.1f} 分钟未更新，禁止新增买入")
         if not recommendation.get("liveBuyAllowed", False):
             reasons.append("推荐闸门未打开，禁止新增买入")
         trade_codes = {str(item.get("code", "")).zfill(6) for item in recommendation.get("recommendedBuys", [])}
@@ -171,6 +229,10 @@ def trade_gate_reasons(order: OrderRequest, state: dict, recommendation: dict) -
             reasons.append("标的不在可买清单")
         if not price:
             reasons.append("缺少可用价格")
+        if price and quote_price:
+            divergence = abs(price / quote_price - 1) * 100
+            if divergence > MAX_PRICE_DIVERGENCE_PCT:
+                reasons.append(f"委托价与实时价偏差 {divergence:.2f}%，超过 {MAX_PRICE_DIVERGENCE_PCT}%")
         if price * order.quantity > float(state.get("cash", 0)):
             reasons.append("现金不足")
         if price:
@@ -198,57 +260,7 @@ def execute_order(order: OrderRequest, state: dict, recommendation: dict) -> dic
     price = float(order.price or quote.get("price") or 0)
     name = order.name or quote.get("name") or code
     reasons = trade_gate_reasons(order, state, recommendation)
-    order_record = {
-        "id": len(state.get("orders", [])) + 1,
-        "side": order.side,
-        "code": code,
-        "name": name,
-        "quantity": order.quantity,
-        "price": round(price, 3) if price else None,
-        "status": "CHECKED" if order.dryRun and not reasons else "REJECTED" if reasons else "FILLED",
-        "dryRun": order.dryRun,
-        "reasons": reasons,
-    }
-    if order.dryRun or reasons:
-        state.setdefault("orders", []).append(order_record)
-        return order_record
-
-    gross = price * order.quantity
-    if order.side == "BUY":
-        state["cash"] = round(float(state.get("cash", 0)) - gross, 2)
-        existing = next((item for item in state.get("positions", []) if item["code"] == code), None)
-        if existing:
-            total_qty = int(existing["quantity"]) + order.quantity
-            existing["avgPrice"] = round(
-                (float(existing["avgPrice"]) * int(existing["quantity"]) + gross) / total_qty,
-                3,
-            )
-            existing["quantity"] = total_qty
-        else:
-            state.setdefault("positions", []).append(
-                {
-                    "code": code,
-                    "name": name,
-                    "quantity": order.quantity,
-                    "avgPrice": round(price, 3),
-                    "lastPrice": round(price, 3),
-                }
-            )
-    else:
-        state["cash"] = round(float(state.get("cash", 0)) + gross, 2)
-        next_positions = []
-        for position in state.get("positions", []):
-            if position["code"] != code:
-                next_positions.append(position)
-                continue
-            remaining = int(position["quantity"]) - order.quantity
-            if remaining > 0:
-                next_positions.append({**position, "quantity": remaining, "lastPrice": round(price, 3)})
-        state["positions"] = next_positions
-
-    state.setdefault("orders", []).append(order_record)
-    state.setdefault("trades", []).append({**order_record, "gross": round(gross, 2)})
-    return order_record
+    return apply_paper_order(order.model_dump(), state, price=price, name=name, reasons=reasons)
 
 
 def report_status(relative_path: str) -> dict:
@@ -279,6 +291,97 @@ def read_jsonl_tail(relative_path: str, limit: int = 40) -> list[dict]:
     return rows
 
 
+def metric_value(metrics: dict, *keys: str) -> Any:
+    for key in keys:
+        if key in metrics:
+            return metrics[key]
+    return None
+
+
+def build_strategy_center(backtest_result: dict, signals: dict, recommendation: dict) -> dict:
+    metrics = backtest_result.get("metrics", {}) if isinstance(backtest_result, dict) else {}
+    trade_ready = int(signals.get("stats", {}).get("tradeReady") or len(signals.get("trade", []) or []))
+    rows = [
+        {
+            "key": "strong_pullback",
+            "name": "强势股回调",
+            "enabled": True,
+            "status": "SEED",
+            "horizon": "1-3个交易日",
+            "source": "MVP 规则策略",
+            "winRatePct": None,
+            "maxDrawdownPct": None,
+            "parameters": ["站上5/10/20日均线", "不追高开7%以上", "回踩买区确认", "非ST/非退市"],
+            "gates": ["推荐闸门", "买区", "止损线", "单票仓位"],
+            "note": "第一版主策略，用于把候选股转成买区、止损和人工确认计划。",
+        },
+        {
+            "key": "volume_breakout",
+            "name": "放量突破",
+            "enabled": True,
+            "status": "TESTED" if metric_value(metrics, "tradeCount", "closedTrades") else "ACTIVE",
+            "horizon": recommendation.get("holdingPeriod") or "1-3个交易日",
+            "source": "backend/strategy/trend_breakout.py",
+            "winRatePct": metric_value(metrics, "winRatePct", "win_rate_pct"),
+            "maxDrawdownPct": metric_value(metrics, "maxDrawdownPct", "max_drawdown_pct"),
+            "parameters": ["涨幅3%-7%", "量比>=1.5", "均线多头", "趋势评分>=70"],
+            "gates": ["数据审计", "成交额/换手", "风险等级", "模拟预检"],
+            "note": "当前实际选股主策略，负责输出股票池、推荐雷达和回测样本。",
+        },
+        {
+            "key": "limit_pullback",
+            "name": "涨停后低吸",
+            "enabled": False,
+            "status": "PLANNED",
+            "horizon": "1-5个交易日",
+            "source": "knowledge/Strategy-KB/leader/Limit-Up-Leader.md",
+            "winRatePct": None,
+            "maxDrawdownPct": None,
+            "parameters": ["涨停后不追板", "回踩5日线", "开板承接", "高波动降仓"],
+            "gates": ["情绪周期", "一字板过滤", "开板次数", "流动性"],
+            "note": "已在知识库建档，后续补回测脚本和 L3 指标后再启用。",
+        },
+    ]
+    return {
+        "summary": {
+            "enabled": sum(1 for item in rows if item["enabled"]),
+            "planned": sum(1 for item in rows if not item["enabled"]),
+            "knowledgeStrategies": 0,
+            "tradeReady": trade_ready,
+            "productionReady": 0,
+        },
+        "rows": rows,
+    }
+
+
+def build_backtest_review(backtest_result: dict, paper_state: dict) -> dict:
+    metrics = backtest_result.get("metrics", {}) if isinstance(backtest_result, dict) else {}
+    trades = backtest_result.get("trades", []) if isinstance(backtest_result.get("trades", []), list) else []
+    closed_trades = int(metric_value(metrics, "closedTrades", "tradeCount") or len(trades))
+    return {
+        "metrics": {
+            "closedTrades": closed_trades,
+            "buyCount": metric_value(metrics, "buyCount"),
+            "winRatePct": metric_value(metrics, "winRatePct", "win_rate_pct"),
+            "maxDrawdownPct": metric_value(metrics, "maxDrawdownPct", "max_drawdown_pct"),
+            "averageReturnPct": metric_value(metrics, "averageReturnPct", "average_return_pct"),
+            "totalReturnPct": metric_value(metrics, "totalReturnPct", "total_return_pct"),
+            "profitLossRatio": metric_value(metrics, "profitLossRatio", "profit_loss_ratio"),
+            "paperTotalReturnPct": paper_state.get("metrics", {}).get("totalReturnPct"),
+            "paperOpenExposurePct": paper_state.get("metrics", {}).get("openExposurePct"),
+        },
+        "sampleReady": closed_trades >= 20,
+        "rules": [
+            {"label": "T+1", "status": "PLANNED", "detail": "后续回测引擎需禁止当日买入当日卖出。"},
+            {"label": "涨跌停", "status": "PLANNED", "detail": "需模拟涨停买不进、跌停卖不出。"},
+            {"label": "手续费/印花税", "status": "PLANNED", "detail": "当前简易持有期回测未完全计入真实交易成本。"},
+            {"label": "滑点", "status": "PLANNED", "detail": "后续按成交额与波动率引入动态滑点。"},
+            {"label": "成交量不足", "status": "PLANNED", "detail": "需要限制单笔成交额占当日成交额比例。"},
+        ],
+        "recentTrades": trades[:12],
+    }
+
+
 def persisted_stock_signals(limit: int = 30) -> list[StockSignal]:
     payload = read_json_report("quant-system/backend/data/stock_pool_latest.json", {})
     rows = payload.get("signals", []) if isinstance(payload, dict) else []
@@ -303,6 +406,28 @@ def persisted_stock_signals(limit: int = 30) -> list[StockSignal]:
     return signals
 
 
+def persisted_stock_signal(code: str) -> StockSignal | None:
+    normalized = code.zfill(6)
+    return next((signal for signal in persisted_stock_signals(100) if signal.code == normalized), None)
+
+
+def mark_degraded_response(response: Response, source: str) -> None:
+    response.headers["X-Quant-Degraded"] = "true"
+    response.headers["X-Quant-Data-Source"] = source
+    response.headers["X-Quant-Warning"] = "live market provider unavailable"
+
+
+def market_data_unavailable(exc: Exception) -> HTTPException:
+    return HTTPException(
+        status_code=503,
+        detail={
+            "error": "market_data_unavailable",
+            "message": "实时行情源暂不可用，且没有可用的本地降级数据。",
+            "detail": str(exc),
+        },
+    )
+
+
 @app.get("/api/trading")
 def trading_state() -> dict:
     state = trade_state()
@@ -325,6 +450,7 @@ def place_order(order: OrderRequest) -> dict:
     recommendation = read_json_report("reports/data/latest-quant-recommendation.json", {})
     record = execute_order(order, state, recommendation)
     write_json_report("reports/data/trade-ops-state.json", state)
+    append_execution_audit("trading.order", order.model_dump(), record)
     return {
         "order": record,
         "state": trading_state(),
@@ -337,6 +463,7 @@ def workbench() -> dict:
     signals = read_json_report("reports/data/latest-trading-signals.json", {})
     recommendation = read_json_report("reports/data/latest-quant-recommendation.json", {})
     scan = read_json_report("reports/data/latest-free-a-share-scan.brief.json", {})
+    refresh_report = read_json_report("reports/data/latest-refresh-report.json", {})
     backtest_result = read_json_report("reports/data/backtest-result.json", {})
     paper_state = read_json_report("reports/data/paper-trading-state.json", {})
     committee = read_json_report("reports/data/latest-investment-committee.json", {})
@@ -350,7 +477,29 @@ def workbench() -> dict:
         "paper": report_status("reports/data/paper-trading-state.json"),
         "scan": report_status("reports/data/latest-free-a-share-scan.brief.json"),
         "committee": report_status("reports/data/latest-investment-committee.json"),
+        "refreshReport": report_status("reports/data/latest-refresh-report.json"),
     }
+    latest_live_time = latest_live_quote_time()
+    hard_gate_reasons: list[str] = []
+    if refresh_report.get("warning"):
+        hard_gate_reasons.append("最近一次刷新存在数据源警告，候选仅供观察")
+    if refresh_report.get("ok") is False or refresh_report.get("criticalFailures"):
+        hard_gate_reasons.append("最近一次刷新存在关键失败，禁止新增买入")
+    if latest_live_time and is_a_share_trading_time():
+        quote_age = minutes_since(latest_live_time)
+        if quote_age > MAX_INTRADAY_QUOTE_AGE_MINUTES:
+            hard_gate_reasons.append(f"盘中行情已 {quote_age:.1f} 分钟未更新，禁止新增买入")
+    effective_live_buy_allowed = bool(recommendation.get("liveBuyAllowed", False)) and not hard_gate_reasons
+    recommended_buys = recommendation.get("recommendedBuys", [])
+    if not effective_live_buy_allowed:
+        recommended_buys = [
+            {
+                **item,
+                "action": "WATCH" if item.get("action") == "TRADE" else item.get("action"),
+                "blockedReasons": [*(item.get("blockedReasons") or []), *hard_gate_reasons][:5],
+            }
+            for item in recommended_buys
+        ]
 
     return {
         "updatedAt": open_watch.get("generatedAt")
@@ -379,10 +528,10 @@ def workbench() -> dict:
             "requestTime": signals.get("requestTime"),
         },
         "recommendation": {
-            "status": recommendation.get("status", "UNKNOWN"),
-            "liveBuyAllowed": recommendation.get("liveBuyAllowed", False),
-            "recommendedBuys": recommendation.get("recommendedBuys", []),
-            "reasons": recommendation.get("reasons", []),
+            "status": recommendation.get("status", "UNKNOWN") if effective_live_buy_allowed else "WATCH_ONLY",
+            "liveBuyAllowed": effective_live_buy_allowed,
+            "recommendedBuys": recommended_buys,
+            "reasons": [*hard_gate_reasons, *(recommendation.get("reasons", []) or [])],
             "watchPlan": recommendation.get("watchPlan", []),
             "qualityRadar": recommendation.get("qualityRadar", []),
             "upliftTop": recommendation.get("upliftTop", []),
@@ -391,6 +540,8 @@ def workbench() -> dict:
             "backtest": backtest_result.get("metrics", {}),
             "paper": paper_state.get("metrics", {}),
         },
+        "strategyCenter": build_strategy_center(backtest_result, signals, recommendation),
+        "backtestReview": build_backtest_review(backtest_result, paper_state),
         "trading": {
             "mode": trading.get("mode"),
             "cash": trading.get("cash"),
@@ -446,20 +597,131 @@ def committee_latest() -> dict:
     return read_json_report("reports/data/latest-investment-committee.json", {"decisions": []})
 
 
+@app.get("/api/research/latest")
+def research_latest() -> dict:
+    return read_json_report("reports/data/latest-research-report.json", {"decisions": [], "evidence": []})
+
+
+@app.get("/api/strategies")
+def strategy_registry() -> dict:
+    persisted = read_json_report("reports/data/strategy-registry.json", {})
+    return persisted if persisted.get("rows") else build_strategy_registry()
+
+
+@app.get("/api/agent/v1/capabilities")
+def agent_v1_capabilities() -> dict:
+    payload = agent_capabilities()
+    append_agent_audit("capabilities", {}, {"ok": True, "status": "OK"})
+    return payload
+
+
+@app.get("/api/agent/v1/research/latest")
+def agent_v1_research_latest() -> dict:
+    payload = read_json_report("reports/data/latest-research-report.json", {"decisions": [], "evidence": []})
+    append_agent_audit("research.latest", {}, {"ok": True, "status": "OK"})
+    return payload
+
+
+@app.get("/api/agent/v1/strategies")
+def agent_v1_strategies() -> dict:
+    payload = strategy_registry()
+    append_agent_audit("strategies", {}, {"ok": True, "status": "OK"})
+    return payload
+
+
+@app.get("/api/agent/v1/workbench")
+def agent_v1_workbench() -> dict:
+    payload = read_json_report("reports/data/latest-workbench-snapshot.json", {})
+    if not payload:
+        payload = {
+            "research": read_json_report("reports/data/latest-research-report.json", {"decisions": []}),
+            "strategies": strategy_registry(),
+            "committee": read_json_report("reports/data/latest-investment-committee.json", {"decisions": []}),
+            "trading": trading_state(),
+        }
+    append_agent_audit("workbench", {}, {"ok": True, "status": "OK"})
+    return payload
+
+
+@app.get("/api/agent/v1/audit/latest")
+def agent_v1_audit_latest(limit: int = Query(default=40, ge=1, le=200)) -> dict:
+    rows = read_jsonl_tail("reports/data/agent-gateway-audit.jsonl", limit)
+    return {"mode": "PAPER_ONLY", "rows": rows}
+
+
+@app.post("/api/agent/v1/orders/preflight")
+def agent_v1_order_preflight(request: AgentPreflightRequest) -> dict:
+    order = OrderRequest(
+        side=request.side,
+        code=request.code,
+        name=request.name,
+        quantity=request.quantity,
+        price=request.price,
+        dryRun=True,
+    )
+    state = trade_state()
+    recommendation = read_json_report("reports/data/latest-quant-recommendation.json", {})
+    order_record = execute_order(order, state, recommendation)
+    result = {
+        "ok": order_record.get("status") == "CHECKED",
+        "status": order_record.get("status"),
+        "mode": "PAPER_ONLY",
+        "forcedDryRun": True,
+        "order": order_record,
+        "reasons": order_record.get("reasons", []),
+        "strategyKey": request.strategyKey,
+        "rationale": request.rationale,
+    }
+    append_agent_audit("orders.preflight", request.model_dump(), result)
+    return result
+
+
 @app.get("/api/stock-pool", response_model=list[StockSignal])
-def stock_pool(limit: int = Query(default=30, ge=1, le=100)) -> list[StockSignal]:
-    provider = get_provider()
-    quotes = provider.list_a_shares()
+def stock_pool(
+    response: Response,
+    limit: int = Query(default=30, ge=1, le=100),
+    live: bool = Query(default=False, description="实时拉取行情并重新计算；默认读取最近一次持久化股票池。"),
+) -> list[StockSignal]:
+    if not live:
+        signals = persisted_stock_signals(limit)
+        if signals:
+            response.headers["X-Quant-Data-Source"] = "quant-system/backend/data/stock_pool_latest.json"
+            return signals
+
+    try:
+        provider = get_provider()
+        quotes = provider.list_a_shares()
+    except ProviderUnavailable as exc:
+        signals = persisted_stock_signals(limit)
+        if not signals:
+            raise market_data_unavailable(exc) from exc
+        mark_degraded_response(response, "quant-system/backend/data/stock_pool_latest.json")
+        return signals
     signals = run_trend_breakout(quotes, provider.get_daily_kline, limit=limit)
-    if not signals:
-        return persisted_stock_signals(limit)
     return [enrich_with_openai(signal) for signal in signals]
 
 
 @app.get("/api/stocks/{code}/analysis", response_model=StockSignal | dict)
-def stock_analysis(code: str) -> StockSignal | dict:
-    provider = get_provider()
-    quotes = provider.list_a_shares()
+def stock_analysis(
+    code: str,
+    response: Response,
+    live: bool = Query(default=False, description="实时拉取行情并重新分析；默认读取最近一次持久化信号。"),
+) -> StockSignal | dict:
+    if not live:
+        signal = persisted_stock_signal(code)
+        if signal:
+            response.headers["X-Quant-Data-Source"] = "quant-system/backend/data/stock_pool_latest.json"
+            return signal
+
+    try:
+        provider = get_provider()
+        quotes = provider.list_a_shares()
+    except ProviderUnavailable as exc:
+        signal = persisted_stock_signal(code)
+        if signal:
+            mark_degraded_response(response, "quant-system/backend/data/stock_pool_latest.json")
+            return signal
+        raise market_data_unavailable(exc) from exc
     quote = next((item for item in quotes if item.code == code.zfill(6)), None)
     if not quote:
         return {"error": "stock not found"}
@@ -498,11 +760,34 @@ def stock_supplements(code: str) -> dict:
 
 @app.get("/api/backtest")
 def backtest(
+    response: Response,
     codes: str = Query(..., description="逗号分隔股票代码，如 000001,600519"),
     hold_days: int = Query(default=5, ge=1, le=30),
+    live: bool = Query(default=False, description="实时拉取行情源；默认使用本地报告和K线缓存。"),
 ):
-    provider = get_provider()
-    quotes = provider.list_a_shares()
+    if live:
+        try:
+            provider = get_provider()
+            quotes = provider.list_a_shares()
+        except ProviderUnavailable:
+            provider = ReportFallbackProvider()
+            quotes = provider.list_a_shares()
+            mark_degraded_response(response, "reports/data/latest-free-a-share-scan.brief.json")
+    else:
+        provider = ReportFallbackProvider()
+        quotes = provider.list_a_shares()
+        response.headers["X-Quant-Data-Source"] = "reports/data/latest-free-a-share-scan.brief.json"
+
+    if not quotes:
+        return {
+            "strategy": "hold_days",
+            "trades": [],
+            "total_return_pct": 0,
+            "win_rate_pct": 0,
+            "average_return_pct": 0,
+            "max_drawdown_pct": 0,
+            "warning": "没有可用的本地报告数据。",
+        }
     quote_map: dict[str, StockQuote] = {item.code: item for item in quotes}
     code_list = [item.strip().zfill(6) for item in codes.split(",") if item.strip()]
     return run_hold_days_backtest(

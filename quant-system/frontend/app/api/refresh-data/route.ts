@@ -1,14 +1,16 @@
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import { NextResponse } from "next/server";
-import { getWorkbenchSnapshot } from "../../../lib/local-data";
+import { requireAllowedUserResponse } from "../../../lib/access-control";
+import { getWorkbenchSnapshot, isPublicReadOnly } from "../../../lib/local-data";
 
 const execFileAsync = promisify(execFile);
 const repoRoot = path.resolve(process.cwd(), "../..");
 const quantRoot = path.join(repoRoot, "quant-system");
+const refreshReportPath = path.join(repoRoot, "reports/data/latest-refresh-report.json");
 
 function shanghaiTradeDate() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -22,7 +24,11 @@ function shanghaiTradeDate() {
 export const dynamic = "force-dynamic";
 
 async function runPython(scriptName: string, args: string[], timeout: number) {
-  const pythonPath = path.join(quantRoot, ".venv/bin/python");
+  const python311Path = path.join(quantRoot, ".venv311/bin/python");
+  const pythonPath = await fs
+    .access(python311Path)
+    .then(() => python311Path)
+    .catch(() => path.join(quantRoot, ".venv/bin/python"));
   const scriptPath = path.join(quantRoot, "backend", scriptName);
   const result = await execFileAsync(pythonPath, [scriptPath, ...args], {
     cwd: quantRoot,
@@ -34,6 +40,31 @@ async function runPython(scriptName: string, args: string[], timeout: number) {
     stdout: result.stdout,
     stderr: result.stderr,
   };
+}
+
+async function runNodeScript(scriptName: string, timeout: number) {
+  const result = await execFileAsync(process.execPath, [path.join(quantRoot, "scripts", scriptName)], {
+    cwd: quantRoot,
+    timeout,
+    maxBuffer: 1024 * 1024 * 4,
+  });
+  return {
+    script: scriptName,
+    stdout: result.stdout,
+    stderr: result.stderr,
+  };
+}
+
+async function atomicWriteText(filePath: string, text: string) {
+  if (isPublicReadOnly()) throw new Error("公开部署为只读模式，禁止写入刷新结果");
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  const tmpPath = path.join(path.dirname(filePath), `.${path.basename(filePath)}.${process.pid}.tmp`);
+  await fs.writeFile(tmpPath, text, "utf8");
+  await fs.rename(tmpPath, filePath);
+}
+
+async function atomicWriteJson(filePath: string, payload: unknown) {
+  await atomicWriteText(filePath, JSON.stringify(payload, null, 2));
 }
 
 function eastMoneyUrl(page: number) {
@@ -87,7 +118,7 @@ async function fetchEastMoneyRows(scanLimit: number) {
   }
   if (!rows.length) throw new Error("东方财富实时接口没有可用行情");
   const inputPath = path.join(os.tmpdir(), `eastmoney-live-${Date.now()}.json`);
-  await fs.writeFile(inputPath, JSON.stringify(rows, null, 2), "utf8");
+  await atomicWriteJson(inputPath, rows);
   return inputPath;
 }
 
@@ -149,13 +180,103 @@ async function fetchTencentCandidateQuotes() {
   if (!rows.length) throw new Error("腾讯实时接口没有返回有效候选行情");
   const generatedAt = new Date().toISOString();
   const reportPath = path.join(repoRoot, "reports/data/live-tencent-candidate-quotes.json");
-  await fs.mkdir(path.dirname(reportPath), { recursive: true });
-  await fs.writeFile(
+  await atomicWriteJson(
     reportPath,
-    JSON.stringify({ source: "Tencent qt.gtimg.cn", generatedAt, rows }, null, 2),
-    "utf8",
+    { source: "Tencent qt.gtimg.cn", generatedAt, rows },
   );
   return { rows: rows.length, latestTime: rows.map((row) => row.time).sort().at(-1) };
+}
+
+function tencentTradeDate(value?: string) {
+  const text = String(value || "");
+  const match = text.match(/^(\d{4})(\d{2})(\d{2})/);
+  return match ? `${match[1]}-${match[2]}-${match[3]}` : "";
+}
+
+function shanghaiMinutesNow() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Shanghai",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  })
+    .formatToParts(new Date())
+    .reduce<Record<string, string>>((memo, part) => {
+      memo[part.type] = part.value;
+      return memo;
+    }, {});
+  return Number(parts.hour || 0) * 60 + Number(parts.minute || 0);
+}
+
+function daysBetween(fromDate: string, toDate: string) {
+  const from = Date.parse(`${fromDate}T00:00:00+08:00`);
+  const to = Date.parse(`${toDate}T00:00:00+08:00`);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return Number.POSITIVE_INFINITY;
+  return Math.floor((to - from) / 86400000);
+}
+
+function liveQuoteDateAcceptable(latestTickDate: string, tradeDate: string) {
+  if (!latestTickDate) return false;
+  if (latestTickDate >= tradeDate) return true;
+  const preOpen = shanghaiMinutesNow() < 9 * 60 + 30;
+  return preOpen && daysBetween(latestTickDate, tradeDate) <= 3;
+}
+
+async function readJson(relativePath: string, fallback: Record<string, any> = {}) {
+  try {
+    return JSON.parse(await fs.readFile(path.join(repoRoot, relativePath), "utf8"));
+  } catch {
+    return fallback;
+  }
+}
+
+function rowCode(row: Record<string, any>) {
+  return String(row.code || "").padStart(6, "0");
+}
+
+function rowName(row: Record<string, any>) {
+  return String(row.name || "");
+}
+
+function rowPct(row: Record<string, any>) {
+  return Number(row.pct_chg ?? row.pct ?? 0);
+}
+
+function limitUpThreshold(row: Record<string, any>) {
+  const code = rowCode(row);
+  if (rowName(row).toUpperCase().includes("ST")) return 5;
+  if (code.startsWith("83") || code.startsWith("87") || code.startsWith("88") || code.startsWith("92")) return 30;
+  if (code.startsWith("30") || code.startsWith("68")) return 20;
+  return 10;
+}
+
+function isExecutionBlocked(row: Record<string, any>) {
+  const status = String(row.execution_status || row.execution?.status || "").toUpperCase();
+  if (status) return status === "BLOCKED_LIMIT_UP";
+  return rowPct(row) >= limitUpThreshold(row) - 0.08;
+}
+
+function isPrimaryTradeCandidate(row: Record<string, any>) {
+  const action = String(row.action || "").toUpperCase();
+  const recommendationType = String(row.recommendation_type || row.recommendationType || "").toUpperCase();
+  return action === "TRADE" && recommendationType !== "LIMIT_REVIEW" && !isExecutionBlocked(row);
+}
+
+async function publishedOutputFailures() {
+  const failures: string[] = [];
+  const recommendation = await readJson("reports/data/latest-quant-recommendation.json");
+  const signals = await readJson("reports/data/latest-trading-signals.json");
+  const recommendedBuys = Array.isArray(recommendation.recommendedBuys) ? recommendation.recommendedBuys : [];
+  const tradeRows = Array.isArray(signals.trade) ? signals.trade : [];
+  const invalidRecommended = recommendedBuys.filter((row: Record<string, any>) => !isPrimaryTradeCandidate(row));
+  const invalidTradeRows = tradeRows.filter((row: Record<string, any>) => !isPrimaryTradeCandidate(row));
+  if (invalidRecommended.length) {
+    failures.push(`推荐买入池存在不合规候选：${invalidRecommended.slice(0, 6).map((row: Record<string, any>) => `${rowCode(row)} ${rowName(row)}`).join("、")}`);
+  }
+  if (invalidTradeRows.length) {
+    failures.push(`交易信号池存在不合规 TRADE：${invalidTradeRows.slice(0, 6).map((row: Record<string, any>) => `${rowCode(row)} ${rowName(row)}`).join("、")}`);
+  }
+  return failures;
 }
 
 function csvLineSplit(line: string) {
@@ -191,6 +312,32 @@ function parseCsv(text: string) {
   });
 }
 
+function dateFromStockPoolName(filePath: string) {
+  const match = path.basename(filePath).match(/stock_pool_(\d{4}-\d{2}-\d{2})\.csv$/);
+  return match?.[1] || "";
+}
+
+async function findPreviousStockPoolPath(todayTradeDate: string) {
+  const dir = path.join(repoRoot, "quant-system/data");
+  const entries = await fs.readdir(dir).catch(() => []);
+  const candidates = entries
+    .filter((name) => /^stock_pool_\d{4}-\d{2}-\d{2}\.csv$/.test(name))
+    .map((name) => path.join(dir, name))
+    .filter((filePath) => dateFromStockPoolName(filePath) < todayTradeDate)
+    .sort((a, b) => dateFromStockPoolName(b).localeCompare(dateFromStockPoolName(a)));
+  return candidates[0] || "";
+}
+
+function previousCandidateFromCsv(row: Record<string, string>) {
+  return {
+    code: String(row["code"] || row["代码"] || "").padStart(6, "0"),
+    name: String(row["name"] || row["真实简称"] || row["输入名称"] || ""),
+    previousScore: Number(row["score"] || row["量化总分"] || 0),
+    previousPct: Number(row["pct_chg"] || row["涨跌幅%"] || 0),
+    previousLayer: row["tier"] || row["研究层级"] || row["action"] || "",
+  };
+}
+
 function continuityStatus(quote: Record<string, any>, inToday: boolean) {
   const pct = Number(quote?.pct || 0);
   const volumeRatio = Number(quote?.volumeRatio || 0);
@@ -203,16 +350,51 @@ function continuityStatus(quote: Record<string, any>, inToday: boolean) {
 }
 
 async function writeContinuityReview() {
-  const previousPath = path.join(repoRoot, "outputs/quant_analysis_20260615/量化分析全表_20260615.csv");
+  const tradeDate = shanghaiTradeDate();
+  const previousPath = await findPreviousStockPoolPath(tradeDate);
   const todayPath = path.join(repoRoot, "quant-system/backend/data/stock_pool_latest.json");
-  const previous = parseCsv(await fs.readFile(previousPath, "utf8")).slice(0, 30);
   const todayPool = JSON.parse(await fs.readFile(todayPath, "utf8"));
   const todaySignals = Array.isArray(todayPool.signals) ? todayPool.signals.slice(0, 30) : [];
+  if (!previousPath) {
+    const payload = {
+      generatedAt: new Date().toISOString(),
+      previousSource: null,
+      previousTradeDate: null,
+      todaySource: "quant-system/backend/data/stock_pool_latest.json",
+      todayTradeDate: todayPool.trade_date || tradeDate,
+      modelNote: "未找到今日之前的 stock_pool_YYYY-MM-DD.csv，上一期复核暂不可用。",
+      summary: {
+        previousTotal: 0,
+        todayTotal: todaySignals.length,
+        kept: 0,
+        stillStrong: 0,
+        cooled: 0,
+        overheated: 0,
+        dropped: 0,
+        added: todaySignals.length,
+      },
+      reviewRows: [],
+      addedRows: todaySignals.map((item: Record<string, any>, index: number) => ({
+        code: String(item.code || "").padStart(6, "0"),
+        name: item.name || "",
+        todayRank: index + 1,
+        score: item.score,
+        pct: item.pct_chg,
+        turnover: item.turnover,
+        volumeRatio: item.volume_ratio,
+        risk: item.risk_level,
+        action: item.action,
+      })),
+      priorityRows: [],
+    };
+    const reportPath = path.join(repoRoot, "reports/data/latest-continuity-review.json");
+    await atomicWriteJson(reportPath, payload);
+    return payload.summary;
+  }
+  const previous = parseCsv(await fs.readFile(previousPath, "utf8")).slice(0, 30).map(previousCandidateFromCsv);
+  const previousTradeDate = dateFromStockPoolName(previousPath);
   const todayCodes = new Set(todaySignals.map((item: Record<string, unknown>) => String(item.code || "").padStart(6, "0")));
-  const previousCandidates = previous.map((item) => ({
-    code: String(item["代码"] || "").padStart(6, "0"),
-    name: String(item["真实简称"] || item["输入名称"] || ""),
-  }));
+  const previousCandidates = previous.map((item) => ({ code: item.code, name: item.name }));
   const todayCandidates = todaySignals.map((item: Record<string, unknown>) => ({
     code: String(item.code || "").padStart(6, "0"),
     name: String(item.name || ""),
@@ -228,9 +410,9 @@ async function writeContinuityReview() {
     return {
       ...item,
       previousRank: index + 1,
-      previousScore: Number(source["量化总分"] || 0),
-      previousPct: Number(source["涨跌幅%"] || 0),
-      previousLayer: source["研究层级"] || "",
+      previousScore: Number(source.previousScore || 0),
+      previousPct: Number(source.previousPct || 0),
+      previousLayer: source.previousLayer || "",
       todayPrice: quote.price,
       todayPct: quote.pct,
       todayTurnover: quote.turnover,
@@ -275,9 +457,11 @@ async function writeContinuityReview() {
   };
   const payload = {
     generatedAt: new Date().toISOString(),
-    previousSource: "outputs/quant_analysis_20260615/量化分析全表_20260615.csv",
+    previousSource: path.relative(repoRoot, previousPath),
+    previousTradeDate,
     todaySource: "quant-system/backend/data/stock_pool_latest.json",
-    modelNote: "昨日多因子研究池与今日趋势突破池口径不同；本报告用于连续跟踪解释，不替代交易风控。",
+    todayTradeDate: todayPool.trade_date || tradeDate,
+    modelNote: `上一期 ${previousTradeDate} 股票池与今日 ${todayPool.trade_date || tradeDate} 股票池连续跟踪；本报告用于解释去留，不替代交易风控。`,
     summary,
     reviewRows,
     addedRows,
@@ -287,8 +471,7 @@ async function writeContinuityReview() {
     ],
   };
   const reportPath = path.join(repoRoot, "reports/data/latest-continuity-review.json");
-  await fs.mkdir(path.dirname(reportPath), { recursive: true });
-  await fs.writeFile(reportPath, JSON.stringify(payload, null, 2), "utf8");
+  await atomicWriteJson(reportPath, payload);
   return summary;
 }
 
@@ -323,9 +506,63 @@ async function runLiveSelection(tradeDate: string) {
   }
 }
 
-export async function POST() {
+async function criticalRefreshFailures(results: Array<{ script: string; stdout: string; stderr: string }>, tradeDate: string) {
+  const failures: string[] = [];
+  const selection = results.find((item) => item.script === "run_selection.py" || item.stderr.includes("full-market live selection failed"));
+  if (!selection || selection.script !== "run_selection.py" || selection.stderr.includes("full-market live selection failed")) {
+    failures.push("全市场实时选股失败，当前候选池不能视为今日重算");
+  }
+  const live = results.find((item) => item.script === "live_tencent_quotes");
+  const latestTick = live?.stdout.match(/latest tick (\d{14})/)?.[1] || "";
+  const latestTickDate = tencentTradeDate(latestTick);
+  if (!live || !latestTick || !liveQuoteDateAcceptable(latestTickDate, tradeDate)) {
+    failures.push(`候选实时行情不是今日数据：${latestTickDate || "未知"} < ${tradeDate}`);
+  }
+  const kline = results.find((item) => item.script === "refresh_kline_cache.py");
+  if (!kline || !kline.stdout.includes("kline refreshed:")) {
+    failures.push("K线缓存未完整刷新，技术指标和投委会不能视为完整");
+  }
+  const watchlist = results.find((item) => item.script === "user_watchlist_review");
+  if (!watchlist || watchlist.stderr.trim()) {
+    failures.push("用户票池复核失败，无法解释自选股涨停/漏判原因");
+  } else {
+    const missed = Number(watchlist.stdout.match(/missed=(\d+)/)?.[1] || 0);
+    if (missed > 0) failures.push(`用户票池仍有 ${missed} 只强势/涨停票未进入主分析池`);
+  }
+  failures.push(...(await publishedOutputFailures()));
+  return failures;
+}
+
+function stepOk(item: { script: string; stdout: string; stderr: string }) {
+  if (item.script === "run_selection.py" && item.stdout.includes("selected ")) return true;
+  if (item.script === "refresh_kline_cache.py" && item.stdout.includes("kline refreshed:")) return true;
+  if (item.script === "recommendation_performance.mjs" && item.stdout.includes("recommendation performance rows=")) return true;
+  if (item.script === "verify_recommendation_performance.mjs" && item.stdout.includes("recommendation performance verification passed")) return true;
+  return !item.stderr.trim();
+}
+
+function runningFresh(report: Record<string, any>) {
+  if (report.status !== "RUNNING") return false;
+  const started = Date.parse(String(report.startedAt || ""));
+  if (!Number.isFinite(started)) return false;
+  return Date.now() - started < 15 * 60 * 1000;
+}
+
+function researchArgs() {
+  if (process.env.QUANT_REFRESH_LIVE_SOURCES === "false") return [];
+  return ["--live-sources", "--source-page-size", process.env.QUANT_REFRESH_SOURCE_PAGE_SIZE || "5"];
+}
+
+async function readRefreshReport() {
+  try {
+    return JSON.parse(await fs.readFile(refreshReportPath, "utf8"));
+  } catch {
+    return {};
+  }
+}
+
+async function runRefreshWorkflow(startedAt: string) {
   const tradeDate = shanghaiTradeDate();
-  const startedAt = new Date().toISOString();
   const steps = [
     {
       script: "run_selection.py",
@@ -338,8 +575,24 @@ export async function POST() {
     },
     {
       script: "refresh_kline_cache.py",
-      args: ["--days", "160", "--limit", "30"],
+      args: ["--days", "160", "--limit", "30", "--include-watchlist", "--max-fetch", "12"],
       timeout: 120000,
+      optional: true,
+    },
+    {
+      script: "recommendation_performance.mjs",
+      timeout: 30000,
+      optional: true,
+    },
+    {
+      script: "verify_recommendation_performance.mjs",
+      timeout: 30000,
+      optional: true,
+    },
+    {
+      script: "run_event_backtest.py",
+      args: ["--hold-days", "3", "--limit", "30"],
+      timeout: 90000,
       optional: true,
     },
     {
@@ -348,9 +601,44 @@ export async function POST() {
       optional: true,
     },
     {
+      script: "user_watchlist_review",
+      timeout: 60000,
+      optional: true,
+    },
+    {
       script: "run_committee.py",
       args: [],
       timeout: 90000,
+      optional: true,
+    },
+    {
+      script: "run_research.py",
+      args: researchArgs(),
+      timeout: 120000,
+      optional: true,
+    },
+    {
+      script: "run_strategy_registry.py",
+      args: [],
+      timeout: 30000,
+      optional: true,
+    },
+    {
+      script: "run_strategy_review.py",
+      args: [],
+      timeout: 30000,
+      optional: true,
+    },
+    {
+      script: "run_parameter_backtest.py",
+      args: ["--base-key", "volume_breakout", "--limit", "30", "--window", "160"],
+      timeout: 120000,
+      optional: true,
+    },
+    {
+      script: "run_case_kb_from_failure.py",
+      args: [],
+      timeout: 30000,
       optional: true,
     },
   ];
@@ -366,6 +654,16 @@ export async function POST() {
         } else if (step.script === "continuity_review") {
           const summary = await writeContinuityReview();
           results.push({ script: step.script, stdout: JSON.stringify(summary), stderr: "" });
+        } else if (step.script === "user_watchlist_review") {
+          const result = await execFileAsync(process.execPath, [path.join(quantRoot, "scripts/user_watchlist_review.mjs")], {
+            cwd: quantRoot,
+            timeout: step.timeout,
+            maxBuffer: 1024 * 1024 * 4,
+            env: { ...process.env, TRADE_DATE: tradeDate },
+          });
+          results.push({ script: step.script, stdout: result.stdout, stderr: result.stderr });
+        } else if (step.script.endsWith(".mjs")) {
+          results.push(await runNodeScript(step.script, step.timeout));
         } else {
           results.push(await runPython(step.script, step.args || [], step.timeout));
         }
@@ -379,44 +677,121 @@ export async function POST() {
       }
     }
     const warning = results.map((item) => item.stderr.trim()).filter(Boolean).join("\n") || undefined;
+    const criticalFailures = await criticalRefreshFailures(results, tradeDate);
     const refreshReport = {
-      ok: true,
+      ok: criticalFailures.length === 0,
+      status: criticalFailures.length === 0 ? "SUCCESS" : "FAILED",
       tradeDate,
       startedAt,
       finishedAt: new Date().toISOString(),
       warning,
+      criticalFailures,
       steps: results.map((item) => ({
         script: item.script,
-        ok: !item.stderr.trim(),
+        ok: stepOk(item),
         stdout: item.stdout.slice(0, 2000),
         stderr: item.stderr.slice(0, 4000),
       })),
     };
-    await fs.mkdir(path.join(repoRoot, "reports/data"), { recursive: true });
-    await fs.writeFile(path.join(repoRoot, "reports/data/latest-refresh-report.json"), JSON.stringify(refreshReport, null, 2), "utf8");
-    return NextResponse.json({
-      ok: true,
-      warning,
-      steps: results,
-      snapshot: getWorkbenchSnapshot(),
-    });
+    await atomicWriteJson(refreshReportPath, refreshReport);
+    return refreshReport;
   } catch (error) {
     const detail = error instanceof Error ? error.message : "数据更新失败";
     const refreshReport = {
       ok: false,
+      status: "FAILED",
       tradeDate,
       startedAt,
       finishedAt: new Date().toISOString(),
       detail,
       steps: results.map((item) => ({
         script: item.script,
-        ok: !item.stderr.trim(),
+        ok: stepOk(item),
         stdout: item.stdout.slice(0, 2000),
         stderr: item.stderr.slice(0, 4000),
       })),
     };
-    await fs.mkdir(path.join(repoRoot, "reports/data"), { recursive: true });
-    await fs.writeFile(path.join(repoRoot, "reports/data/latest-refresh-report.json"), JSON.stringify(refreshReport, null, 2), "utf8");
-    return NextResponse.json({ ok: false, detail, steps: results }, { status: 500 });
+    await atomicWriteJson(refreshReportPath, refreshReport);
+    return refreshReport;
   }
+}
+
+export async function GET() {
+  const blocked = await requireAllowedUserResponse();
+  if (blocked) return blocked;
+  const report = await readRefreshReport();
+  return NextResponse.json({
+    ok: report.ok !== false,
+    running: report.status === "RUNNING",
+    report,
+    snapshot: getWorkbenchSnapshot(),
+  });
+}
+
+export async function POST() {
+  const blocked = await requireAllowedUserResponse();
+  if (blocked) return blocked;
+  if (isPublicReadOnly()) {
+    return NextResponse.json(
+      {
+        ok: false,
+        queued: false,
+        running: false,
+        detail: "公开部署为只读模式，不能在线刷新；请在私有环境刷新后重新部署。",
+        snapshot: getWorkbenchSnapshot(),
+      },
+      { status: 403 },
+    );
+  }
+  const existingReport = await readRefreshReport();
+  if (runningFresh(existingReport)) {
+    return NextResponse.json(
+      {
+        ok: true,
+        queued: false,
+        running: true,
+        detail: "已有刷新任务正在执行",
+        report: existingReport,
+      },
+      { status: 202 },
+    );
+  }
+
+  const tradeDate = shanghaiTradeDate();
+  const startedAt = new Date().toISOString();
+  const runningReport = {
+    ok: null,
+    status: "RUNNING",
+    tradeDate,
+    startedAt,
+    finishedAt: null,
+    detail: "数据刷新正在后台执行",
+    criticalFailures: [],
+    steps: [],
+  };
+  await atomicWriteJson(refreshReportPath, runningReport);
+
+  const nodePath = process.execPath;
+  const workerPath = path.join(quantRoot, "scripts/refresh_worker.mjs");
+  const child = spawn(nodePath, [workerPath], {
+    cwd: quantRoot,
+    detached: true,
+    stdio: "ignore",
+    env: {
+      ...process.env,
+      REFRESH_STARTED_AT: startedAt,
+      TRADE_DATE: tradeDate,
+    },
+  });
+  child.unref();
+
+  return NextResponse.json(
+    {
+      ok: true,
+      queued: true,
+      running: true,
+      report: runningReport,
+    },
+    { status: 202 },
+  );
 }

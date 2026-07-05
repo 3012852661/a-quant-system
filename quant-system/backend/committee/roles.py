@@ -28,6 +28,30 @@ def read_json(path: Path, fallback: Any) -> Any:
         return fallback
 
 
+def read_markdown_knowledge(limit: int = 12) -> list[dict[str, Any]]:
+    root = repo_root() / "quant-system/knowledge"
+    if not root.exists():
+        return []
+    docs: list[dict[str, Any]] = []
+    for path in sorted(root.rglob("*.md")):
+        if "templates" in path.parts:
+            continue
+        text = path.read_text(encoding="utf-8")
+        title = next((line[2:].strip() for line in text.splitlines() if line.startswith("# ")), path.stem)
+        status = next((line.split(":", 1)[1].strip() for line in text.splitlines() if line.startswith("status:")), "L0 raw")
+        bullets = [line[2:].strip() for line in text.splitlines() if line.strip().startswith("- ")][:4]
+        docs.append(
+            {
+                "title": title,
+                "status": status,
+                "path": str(path.relative_to(repo_root())),
+                "bullets": bullets,
+            }
+        )
+    docs.sort(key=lambda item: (not str(item["status"]).startswith(("L2", "L3", "L4")), item["path"]))
+    return docs[:limit]
+
+
 @dataclass
 class RoleReport:
     role: str
@@ -60,6 +84,7 @@ def load_latest_context() -> dict[str, Any]:
         "pool": pool,
         "live": live,
         "recommendation": recommendation,
+        "knowledge": read_markdown_knowledge(),
     }
 
 
@@ -278,7 +303,7 @@ def sentiment_analyst(signal: dict[str, Any], live: dict[str, Any]) -> RoleRepor
     )
 
 
-def risk_officer(signal: dict[str, Any], live: dict[str, Any], reports: dict[str, RoleReport]) -> RoleReport:
+def risk_officer(signal: dict[str, Any], live: dict[str, Any], reports: dict[str, RoleReport], knowledge: list[dict[str, Any]]) -> RoleReport:
     price = to_float(live.get("price") or signal.get("current_price"))
     stop = to_float(signal.get("stop_loss"))
     target = to_float(signal.get("target_price"))
@@ -306,6 +331,11 @@ def risk_officer(signal: dict[str, Any], live: dict[str, Any], reports: dict[str
         if report.data_gaps:
             risks.append(f"{report.role} 数据缺口：{report.data_gaps[0]}")
     evidence.append(f"止损线 {stop or '-'}，目标位 {target or '-'}，买区 {buy_zone or '-'}")
+    kb_refs = [item for item in knowledge if "/Risk-KB/" in item["path"] or "/Strategy-KB/" in item["path"]][:4]
+    for item in kb_refs:
+        evidence.append(f"KB参考：{item['title']}（{item['status']}）")
+    if not any(str(item.get("status", "")).startswith(("L2", "L3", "L4")) for item in kb_refs):
+        risks.append("知识库缺少 L2+ 执行条目，不能进入自动交易")
     return RoleReport(
         role="Risk Officer",
         stance="VETO" if vetoes else "CAUTION" if risks else "OK",
@@ -364,7 +394,7 @@ def analyze_stock(code: str, context: dict[str, Any]) -> CommitteeDecision | Non
     reports["Fundamental Analyst"] = fundamental_analyst(signal, live)
     reports["Technical Analyst"] = technical_analyst(code, signal, live)
     reports["Sentiment Analyst"] = sentiment_analyst(signal, live)
-    reports["Risk Officer"] = risk_officer(signal, live, reports)
+    reports["Risk Officer"] = risk_officer(signal, live, reports, context.get("knowledge", []))
     return portfolio_manager(code, name, reports)
 
 
@@ -378,6 +408,7 @@ def run_committee(codes: list[str] | None = None) -> dict[str, Any]:
         "source": {
             "stockPool": "quant-system/backend/data/stock_pool_latest.json",
             "liveQuotes": "reports/data/live-tencent-candidate-quotes.json",
+            "knowledge": "quant-system/knowledge",
         },
         "method": "Six-role committee: researcher, fundamental, technical, sentiment, risk, portfolio manager",
         "decisions": [serialize_decision(item) for item in decisions],

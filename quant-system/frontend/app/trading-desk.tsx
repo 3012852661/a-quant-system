@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { RotateCw, Send, ShieldCheck, ShieldAlert } from "lucide-react";
+import { ChevronDown, RotateCw, Send, ShieldCheck, ShieldAlert, WalletCards } from "lucide-react";
 
 type Position = {
   code: string;
@@ -23,6 +23,25 @@ type Order = {
   status: string;
   dryRun: boolean;
   reasons: string[];
+  kbWarnings?: string[];
+  kbReferences?: Array<{ title?: string; status?: string; path?: string; rule?: string }>;
+};
+
+type TradeCandidate = {
+  code?: string;
+  name?: string;
+  current_price?: number;
+  price?: number;
+  pct_chg?: number;
+  pct?: number;
+  score?: number;
+  risk_level?: string;
+  buy_zone?: string;
+  stop_loss?: number;
+  target_price?: number;
+  entry?: { buyZone?: string };
+  exit?: { target?: number; stop?: number };
+  sizing?: { hint?: string };
 };
 
 type TradingState = {
@@ -88,7 +107,16 @@ function riskClass(status?: string) {
   return "warn";
 }
 
-export function TradingDesk() {
+function normalizeCode(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 6);
+  return digits ? digits.padStart(6, "0") : "";
+}
+
+function candidatePrice(item?: TradeCandidate) {
+  return Number(item?.current_price ?? item?.price ?? 0);
+}
+
+export function TradingDesk({ candidates = [] }: { candidates?: TradeCandidate[] }) {
   const [state, setState] = useState<TradingState>(emptyState);
   const [side, setSide] = useState<"BUY" | "SELL">("BUY");
   const [code, setCode] = useState("");
@@ -98,10 +126,20 @@ export function TradingDesk() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const selectedPosition = useMemo(
-    () => state.positions.find((item) => item.code === code.padStart(6, "0")),
-    [code, state.positions],
+  const normalizedCode = normalizeCode(code);
+  const selectedPosition = useMemo(() => state.positions.find((item) => item.code === normalizedCode), [normalizedCode, state.positions]);
+  const selectedCandidate = useMemo(
+    () => candidates.find((item) => normalizeCode(String(item.code || "")) === normalizedCode),
+    [candidates, normalizedCode],
   );
+  const orderPrice = Number(price || candidatePrice(selectedCandidate) || selectedPosition?.lastPrice || 0);
+  const orderQuantity = Number(quantity);
+  const orderAmount = Number.isFinite(orderPrice * orderQuantity) ? orderPrice * orderQuantity : 0;
+  const inputWarnings = [
+    !normalizedCode ? "请输入6位股票代码" : "",
+    Number.isFinite(orderQuantity) && orderQuantity > 0 && orderQuantity % 100 === 0 ? "" : "数量需为100股整数倍",
+    side === "SELL" && !selectedPosition ? "卖出需先选择已有持仓" : "",
+  ].filter(Boolean);
 
   async function load() {
     const response = await fetch(`${apiBase()}/api/trading`, { cache: "no-store" });
@@ -111,6 +149,34 @@ export function TradingDesk() {
   useEffect(() => {
     load().catch(() => setMessage("交易状态加载失败"));
   }, []);
+
+  function fillCandidate(item: TradeCandidate) {
+    const nextCode = normalizeCode(String(item.code || ""));
+    setSide("BUY");
+    setCode(nextCode);
+    setName(item.name || "");
+    const nextPrice = candidatePrice(item);
+    setPrice(nextPrice ? nextPrice.toFixed(2) : "");
+    setMessage("");
+    return {
+      code: nextCode,
+      name: item.name || "",
+      price: nextPrice,
+    };
+  }
+
+  function applyCandidate(item: TradeCandidate) {
+    fillCandidate(item);
+  }
+
+  function applyPosition(item: Position) {
+    setSide("SELL");
+    setCode(item.code);
+    setName(item.name);
+    setQuantity(String(Math.max(100, Math.floor(item.quantity / 100) * 100)));
+    setPrice(item.lastPrice ? item.lastPrice.toFixed(2) : "");
+    setMessage("");
+  }
 
   async function submit(dryRun: boolean) {
     setBusy(true);
@@ -132,7 +198,38 @@ export function TradingDesk() {
       if (!response.ok) throw new Error(payload.detail || "提交失败");
       setState(payload.state);
       const reasons = payload.order?.reasons || [];
-      setMessage(reasons.length ? reasons.join("；") : statusText(payload.order.status));
+      const kbWarnings = payload.order?.kbWarnings || [];
+      setMessage([reasons.length ? reasons.join("；") : statusText(payload.order.status), ...kbWarnings.slice(0, 2)].join("；"));
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "提交失败");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function submitCandidate(item: TradeCandidate, dryRun: boolean) {
+    const next = fillCandidate(item);
+    setBusy(true);
+    setMessage("");
+    try {
+      const response = await fetch(`${apiBase()}/api/trading/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          side: "BUY",
+          code: next.code,
+          name: next.name || undefined,
+          quantity: Number(quantity),
+          price: next.price || undefined,
+          dryRun,
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.detail || "提交失败");
+      setState(payload.state);
+      const reasons = payload.order?.reasons || [];
+      const kbWarnings = payload.order?.kbWarnings || [];
+      setMessage([reasons.length ? reasons.join("；") : statusText(payload.order.status), ...kbWarnings.slice(0, 2)].join("；"));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "提交失败");
     } finally {
@@ -190,6 +287,13 @@ export function TradingDesk() {
       </div>
 
       <div className="ticket">
+        <div className="ticketHead">
+          <div>
+            <span className="eyebrow">Order Ticket</span>
+            <strong>{side === "BUY" ? "买入预检" : "卖出委托"}</strong>
+          </div>
+          <span className={`miniBadge ${inputWarnings.length ? "warn" : "good"}`}>{inputWarnings.length ? "待校验" : "就绪"}</span>
+        </div>
         <div className="segmented">
           <button className={side === "BUY" ? "selected" : ""} type="button" onClick={() => setSide("BUY")}>
             买入
@@ -200,7 +304,7 @@ export function TradingDesk() {
         </div>
         <label>
           代码
-          <input value={code} onChange={(event) => setCode(event.target.value)} placeholder="600522" />
+          <input value={code} onBlur={() => setCode(normalizeCode(code))} onChange={(event) => setCode(event.target.value)} placeholder="600522" />
         </label>
         <label>
           名称
@@ -214,22 +318,44 @@ export function TradingDesk() {
           限价
           <input value={price} onChange={(event) => setPrice(event.target.value)} inputMode="decimal" placeholder="留空用最新价" />
         </label>
+        <div className="orderPreview">
+          <WalletCards size={15} />
+          <span>预计金额</span>
+          <strong>{money(orderAmount)}</strong>
+          <small>{selectedCandidate?.entry?.buyZone || selectedCandidate?.buy_zone || selectedPosition?.name || "选择候选后自动带入参考价"}</small>
+        </div>
+        {inputWarnings.length > 0 && (
+          <div className="inlineWarnings">
+            {inputWarnings.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
+        )}
         <div className="ticketActions">
-          <button className="secondaryButton" type="button" disabled={busy} onClick={() => submit(true)}>
+          <button className="secondaryButton" type="button" disabled={busy || inputWarnings.length > 0} onClick={() => submit(true)}>
             <ShieldCheck size={15} />
             风控预检
           </button>
-          <button className="primaryButton" type="button" disabled={busy} onClick={() => submit(false)}>
+          <button className="primaryButton" type="button" disabled={busy || inputWarnings.length > 0} onClick={() => submit(false)}>
             <Send size={15} />
             提交模拟单
           </button>
         </div>
         {message && <div className="tradeMessage">{message}</div>}
+        {selectedCandidate && (
+          <div className="kbHint">
+            <strong>执行参考</strong>
+            <span>{selectedCandidate.risk_level || "策略 KB"} · 先预检再提交，禁止绕过风控闸门</span>
+          </div>
+        )}
       </div>
 
       <div className="tradeTables">
         <div>
-          <div className="miniHeader">当前持仓</div>
+          <div className="miniHeader">
+            当前持仓
+            <ChevronDown size={14} />
+          </div>
           <table className="denseTable tradeTable">
             <thead>
               <tr>
@@ -243,7 +369,7 @@ export function TradingDesk() {
             </thead>
             <tbody>
               {state.positions.map((item) => (
-                <tr key={item.code}>
+                <tr key={item.code} onClick={() => applyPosition(item)}>
                   <td className="mono">{item.code}</td>
                   <td className="nameCell">{item.name}</td>
                   <td>{item.quantity}</td>
@@ -263,7 +389,26 @@ export function TradingDesk() {
           </table>
         </div>
         <div>
-          <div className="miniHeader">最近委托</div>
+          <div className="miniHeader">推荐快填</div>
+          <div className="candidateList">
+            {candidates.slice(0, 12).map((item, index) => (
+              <div className="candidateAction" key={`${item.code}-${item.name}-${index}`}>
+                <button type="button" onClick={() => applyCandidate(item)}>
+                  <span className="mono">{normalizeCode(String(item.code || ""))}</span>
+                  <strong>{item.name || "-"}</strong>
+                  <small>
+                    {money(candidatePrice(item))} / {pct(item.pct_chg ?? item.pct)}
+                  </small>
+                </button>
+                <div>
+                  <button type="button" disabled={busy} onClick={() => submitCandidate(item, true)}>预检</button>
+                  <button type="button" disabled={busy} onClick={() => submitCandidate(item, false)}>模拟买入</button>
+                </div>
+              </div>
+            ))}
+            {!candidates.length && <div className="candidateEmpty">暂无推荐候选</div>}
+          </div>
+          <div className="miniHeader ordersHeader">最近委托</div>
           <table className="denseTable tradeTable">
             <thead>
               <tr>
@@ -281,7 +426,10 @@ export function TradingDesk() {
                   <td className="mono">{item.code}</td>
                   <td>{item.quantity}</td>
                   <td>{money(item.price)}</td>
-                  <td>{statusText(item.status)}</td>
+                  <td>
+                    {statusText(item.status)}
+                    {item.kbReferences?.length ? <small>KB {item.kbReferences.length}</small> : null}
+                  </td>
                 </tr>
               ))}
               {!state.orders.length && (

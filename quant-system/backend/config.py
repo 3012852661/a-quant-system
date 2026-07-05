@@ -7,9 +7,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
-    data_provider: str = Field("akshare", validation_alias=AliasChoices("QUANT_DATA_PROVIDER", "DATA_PROVIDER"))
+    data_provider: str = Field("eastmoney_direct", validation_alias=AliasChoices("QUANT_DATA_PROVIDER", "DATA_PROVIDER"))
+    allow_report_fallback: bool = Field(
+        False,
+        validation_alias=AliasChoices("QUANT_ALLOW_REPORT_FALLBACK", "ALLOW_REPORT_FALLBACK"),
+    )
     data_source_stack: str = Field(
-        "akshare,tushare,cninfo,eastmoney_moneyflow,postgres,vector",
+        "akshare,tushare,cninfo,news,eastmoney_moneyflow,postgres,vector",
         validation_alias=AliasChoices("QUANT_DATA_SOURCE_STACK", "DATA_SOURCE_STACK"),
     )
     max_stocks: int = Field(500, validation_alias=AliasChoices("QUANT_MAX_STOCKS", "MAX_STOCKS"))
@@ -36,6 +40,12 @@ class Settings(BaseSettings):
         "quantitative trading,market microstructure",
         validation_alias=AliasChoices("QUANT_GOOGLE_SCHOLAR_QUERIES", "GOOGLE_SCHOLAR_QUERIES"),
     )
+    news_json_url: str | None = Field(
+        "https://np-listapi.eastmoney.com/comm/web/getNewsByColumns?client=web&biz=web_news_col&column=345&order=1&needInteractData=0&page_index=1&page_size=30&req_trace=1",
+        validation_alias=AliasChoices("QUANT_NEWS_JSON_URL", "NEWS_JSON_URL"),
+    )
+    news_rss_urls: str = Field("", validation_alias=AliasChoices("QUANT_NEWS_RSS_URLS", "NEWS_RSS_URLS"))
+    news_api_key: str | None = Field(None, validation_alias=AliasChoices("QUANT_NEWS_API_KEY", "NEWS_API_KEY"))
     ifind_api_key: str | None = Field(None, validation_alias=AliasChoices("IFIND_API_KEY", "QUANT_IFIND_API_KEY"))
     tianyancha_api_key: str | None = Field(
         None,

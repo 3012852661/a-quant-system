@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import date
 from datetime import datetime
 from pathlib import Path
@@ -11,7 +12,7 @@ from urllib.request import Request, urlopen
 from xml.etree import ElementTree
 
 from backend.config import settings
-from backend.data.models import Announcement, FinancialSnapshot, KLine, MoneyFlow, StockQuote
+from backend.data.models import Announcement, FinancialSnapshot, KLine, MoneyFlow, NewsItem, StockQuote
 
 
 class MarketDataProvider(Protocol):
@@ -24,6 +25,49 @@ class MarketDataProvider(Protocol):
 
 class ProviderUnavailable(RuntimeError):
     pass
+
+
+class ChainedProvider:
+    """Try live providers in order and only use report files when explicitly allowed."""
+
+    def __init__(self, providers: list[MarketDataProvider], labels: list[str]) -> None:
+        self.providers = providers
+        self.labels = labels
+        self.active_index = 0
+
+    @property
+    def active_label(self) -> str:
+        return self.labels[self.active_index] if self.labels else "unknown"
+
+    def list_a_shares(self, limit: int | None = None) -> list[StockQuote]:
+        failures: list[str] = []
+        for index, provider in enumerate(self.providers):
+            label = self.labels[index]
+            try:
+                rows = provider.list_a_shares(limit)
+            except Exception as exc:
+                failures.append(f"{label}: {exc}")
+                continue
+            if rows:
+                self.active_index = index
+                return rows
+            failures.append(f"{label}: returned no quote rows")
+        raise ProviderUnavailable("; ".join(failures) or "no data providers available")
+
+    def get_daily_kline(self, code: str, days: int = 80) -> list[KLine]:
+        failures: list[str] = []
+        ordered = [self.active_index, *[index for index in range(len(self.providers)) if index != self.active_index]]
+        for index in ordered:
+            label = self.labels[index]
+            try:
+                rows = self.providers[index].get_daily_kline(code, days)
+            except Exception as exc:
+                failures.append(f"{label}: {exc}")
+                continue
+            if rows:
+                return rows
+            failures.append(f"{label}: returned no kline rows for {code}")
+        raise ProviderUnavailable("; ".join(failures) or f"no kline provider available for {code}")
 
 
 def _repo_root() -> Path:
@@ -40,6 +84,14 @@ def _to_float(value: object, default: float = 0) -> float:
 
 
 def _to_date(value: object) -> date:
+    if isinstance(value, (int, float)):
+        try:
+            timestamp = float(value)
+            if timestamp > 10_000_000_000:
+                timestamp = timestamp / 1000
+            return datetime.fromtimestamp(timestamp).date()
+        except (OSError, OverflowError, ValueError):
+            return date.today()
     text = str(value or "").strip()
     for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%Y%m%d"):
         try:
@@ -51,6 +103,36 @@ def _to_date(value: object) -> date:
 
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def _symbols_from_news(raw_symbols: Any, title: str, summary: str | None, target_codes: list[str]) -> list[str]:
+    symbols: set[str] = set()
+    if isinstance(raw_symbols, list):
+        values = raw_symbols
+    else:
+        values = str(raw_symbols or "").split(",") if raw_symbols else []
+    for value in values:
+        text = str(value or "").strip()
+        if text:
+            symbols.add(text.zfill(6))
+    searchable = f"{title} {summary or ''}"
+    for code in target_codes:
+        if code and code in searchable:
+            symbols.add(code)
+    return sorted(item for item in symbols if item and len(item) == 6)
+
+
+def _xml_text(node: ElementTree.Element, tag: str) -> str:
+    child = node.find(tag)
+    return "".join(child.itertext()).strip() if child is not None else ""
+
+
+def _cninfo_column(code: str) -> str:
+    return "sse" if str(code).startswith(("6", "9")) else "szse"
+
+
+def _strip_html(value: str) -> str:
+    return re.sub(r"<[^>]+>", "", value).strip()
 
 
 def _read_json(url: str) -> Any:
@@ -93,6 +175,12 @@ def _eastmoney_secid(code: str) -> str:
     normalized = str(code).zfill(6)
     market = "1" if normalized.startswith(("5", "6", "9")) else "0"
     return f"{market}.{normalized}"
+
+
+def _sina_symbol(code: str) -> str:
+    normalized = str(code).zfill(6)
+    market = "sh" if normalized.startswith(("5", "6", "9")) else "sz"
+    return f"{market}{normalized}"
 
 
 class AkShareProvider:
@@ -226,15 +314,25 @@ class CninfoAnnouncementProvider:
         return []
 
     def get_announcements(self, code: str, page_size: int = 20) -> list[Announcement]:
+        normalized = str(code).zfill(6)
+        columns = [_cninfo_column(normalized), "szse" if _cninfo_column(normalized) == "sse" else "sse"]
+        for mode in ("stock", "searchkey"):
+            for column in columns:
+                rows = self._query_announcements(normalized, page_size, column, mode)
+                if rows:
+                    return rows
+        return []
+
+    def _query_announcements(self, code: str, page_size: int, column: str, mode: str) -> list[Announcement]:
         payload = urlencode(
             {
-                "stock": str(code).zfill(6),
+                "stock": code if mode == "stock" else "",
                 "tabName": "fulltext",
                 "pageSize": str(min(max(page_size, 1), 50)),
                 "pageNum": "1",
-                "column": "szse",
+                "column": column,
                 "plate": "",
-                "searchkey": "",
+                "searchkey": code if mode == "searchkey" else "",
                 "secid": "",
                 "category": "",
                 "trade": "",
@@ -261,12 +359,14 @@ class CninfoAnnouncementProvider:
             raise ProviderUnavailable(str(exc)) from exc
         announcements: list[Announcement] = []
         for row in data.get("announcements") or []:
+            if str(row.get("secCode") or "").zfill(6) != code:
+                continue
             adjunct = str(row.get("adjunctUrl") or "")
             url = f"https://static.cninfo.com.cn/{adjunct}" if adjunct else None
             announcements.append(
                 Announcement(
-                    code=str(code).zfill(6),
-                    title=" ".join(str(row.get("announcementTitle") or "").split()),
+                    code=code,
+                    title=_strip_html(" ".join(str(row.get("announcementTitle") or "").split())),
                     announcement_date=_to_date(row.get("announcementTime")),
                     url=url,
                     category=str(row.get("categoryName") or "") or None,
@@ -314,6 +414,107 @@ class EastMoneyMoneyFlowProvider:
                 )
             )
         return flows
+
+
+class ConfigurableNewsProvider:
+    """Licensed/configured JSON or RSS news adapter for research Evidence."""
+
+    def list_a_shares(self, limit: int | None = None) -> list[StockQuote]:
+        return []
+
+    def get_daily_kline(self, code: str, days: int = 80) -> list[KLine]:
+        return []
+
+    def get_news(self, codes: list[str] | None = None, limit: int = 30) -> list[NewsItem]:
+        rows: list[NewsItem] = []
+        if settings.news_json_url:
+            rows.extend(self._get_json_news(settings.news_json_url, codes or [], limit))
+        for url in _split_csv(settings.news_rss_urls):
+            rows.extend(self._get_rss_news(url, codes or [], limit))
+        if not rows:
+            raise ProviderUnavailable("QUANT_NEWS_JSON_URL or QUANT_NEWS_RSS_URLS is not configured or returned no news")
+        return rows[:limit]
+
+    def _request_text(self, url: str) -> str:
+        headers = {"User-Agent": "quant-system/0.1"}
+        if settings.news_api_key:
+            headers["Authorization"] = f"Bearer {settings.news_api_key}"
+        request = Request(url, headers=headers)
+        try:
+            with urlopen(request, timeout=15) as response:
+                return response.read().decode("utf-8")
+        except (HTTPError, URLError, TimeoutError, UnicodeDecodeError) as exc:
+            raise ProviderUnavailable(str(exc)) from exc
+
+    def _get_json_news(self, url: str, codes: list[str], limit: int) -> list[NewsItem]:
+        try:
+            payload = json.loads(self._request_text(url))
+        except json.JSONDecodeError as exc:
+            raise ProviderUnavailable(f"news JSON decode failed: {exc}") from exc
+        rows = self._json_rows(payload)
+        if not isinstance(rows, list):
+            raise ProviderUnavailable("news JSON payload must be a list or contain items/news/data list")
+        return [item for row in rows[:limit] if (item := self._json_row_to_news(row, codes))]
+
+    def _json_rows(self, payload: Any) -> Any:
+        if not isinstance(payload, dict):
+            return payload
+        rows = payload.get("items") or payload.get("news")
+        if rows is not None:
+            return rows
+        data = payload.get("data")
+        if isinstance(data, list):
+            return data
+        if isinstance(data, dict):
+            return data.get("list") or data.get("items") or data.get("news")
+        return None
+
+    def _json_row_to_news(self, row: Any, codes: list[str]) -> NewsItem | None:
+        if not isinstance(row, dict):
+            return None
+        title = str(row.get("title") or row.get("headline") or row.get("name") or "").strip()
+        if not title:
+            return None
+        summary = str(row.get("summary") or row.get("description") or row.get("content") or "").strip() or None
+        symbols = _symbols_from_news(row.get("symbols") or row.get("codes") or row.get("code"), title, summary, codes)
+        return NewsItem(
+            title=title,
+            summary=summary,
+            published_at=str(
+                row.get("published_at") or row.get("publishedAt") or row.get("showTime") or row.get("time") or row.get("date") or ""
+            )
+            or None,
+            url=str(row.get("url") or row.get("uniqueUrl") or row.get("link") or "") or None,
+            symbols=symbols,
+            source=str(row.get("source") or row.get("mediaName") or row.get("provider") or "configured-news-json"),
+            category=str(row.get("category") or row.get("column") or row.get("tag") or "") or None,
+        )
+
+    def _get_rss_news(self, url: str, codes: list[str], limit: int) -> list[NewsItem]:
+        try:
+            root = ElementTree.fromstring(self._request_text(url))
+        except ElementTree.ParseError as exc:
+            raise ProviderUnavailable(f"news RSS parse failed: {exc}") from exc
+        rows: list[NewsItem] = []
+        for item in root.findall(".//item")[:limit]:
+            title = _xml_text(item, "title")
+            if not title:
+                continue
+            summary = _xml_text(item, "description")
+            link = _xml_text(item, "link")
+            published_at = _xml_text(item, "pubDate") or _xml_text(item, "published")
+            rows.append(
+                NewsItem(
+                    title=title,
+                    summary=summary or None,
+                    published_at=published_at or None,
+                    url=link or None,
+                    symbols=_symbols_from_news(None, title, summary, codes),
+                    source="configured-news-rss",
+                    category=_xml_text(item, "category") or None,
+                )
+            )
+        return rows
 
 
 class YahooFinanceProvider:
@@ -440,7 +641,7 @@ class EastMoneyDirectProvider:
     """Direct EastMoney quote adapter used when AkShare is slow or unavailable."""
 
     fs = "m:0+t:6,m:0+t:80,m:1+t:2,m:1+t:23,m:0+t:81+s:2048"
-    fields = "f12,f14,f2,f3,f5,f6,f8,f10,f20,f21,f62,f100"
+    fields = "f12,f14,f2,f3,f5,f6,f8,f10,f20,f21,f62,f100,f124"
 
     def list_a_shares(self, limit: int | None = None) -> list[StockQuote]:
         max_rows = limit or settings.max_stocks
@@ -485,6 +686,7 @@ class EastMoneyDirectProvider:
                         market_cap=_to_float(row.get("f20"), default=0),
                         main_net=_to_float(row.get("f62"), default=0),
                         industry=str(row.get("f100") or "") or None,
+                        quote_time=row.get("f124"),
                     )
                 )
                 if len(quotes) >= max_rows:
@@ -530,6 +732,58 @@ class EastMoneyDirectProvider:
                     low=_to_float(parts[4]),
                     volume=_to_float(parts[5]),
                     amount=_to_float(parts[6], default=0),
+                )
+            )
+        return klines
+
+
+class SinaKLineProvider:
+    """Sina daily K-line fallback used when EastMoney historical endpoints disconnect."""
+
+    def list_a_shares(self, limit: int | None = None) -> list[StockQuote]:
+        return []
+
+    def get_daily_kline(self, code: str, days: int = 80) -> list[KLine]:
+        query = urlencode(
+            {
+                "symbol": _sina_symbol(code),
+                "scale": "240",
+                "ma": "no",
+                "datalen": str(min(max(days, 1), 1023)),
+            }
+        )
+        rows = None
+        errors: list[str] = []
+        for scheme in ("https", "http"):
+            url = f"{scheme}://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?{query}"
+            request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            for _ in range(3):
+                try:
+                    with urlopen(request, timeout=10) as response:
+                        rows = json.loads(response.read().decode("utf-8"))
+                    break
+                except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as exc:
+                    errors.append(str(exc))
+            if rows is not None:
+                break
+        if rows is None:
+            raise ProviderUnavailable("; ".join(errors[-3:]) or f"Sina kline request failed for {code}")
+        if not isinstance(rows, list):
+            raise ProviderUnavailable(f"Sina returned invalid kline payload for {code}")
+        klines: list[KLine] = []
+        for row in rows[-days:]:
+            close = _to_float(row.get("close"))
+            if close <= 0:
+                continue
+            klines.append(
+                KLine(
+                    trade_date=_to_date(row.get("day")),
+                    open=_to_float(row.get("open")),
+                    close=close,
+                    high=_to_float(row.get("high")),
+                    low=_to_float(row.get("low")),
+                    volume=_to_float(row.get("volume")),
+                    amount=None,
                 )
             )
         return klines
@@ -747,6 +1001,8 @@ PROVIDER_FACTORIES = {
     "eastmoney_direct": EastMoneyDirectProvider,
     "eastmoney_moneyflow": EastMoneyMoneyFlowProvider,
     "moneyflow": EastMoneyMoneyFlowProvider,
+    "sina": SinaKLineProvider,
+    "sina_kline": SinaKLineProvider,
     "fallback": ReportFallbackProvider,
     "report": ReportFallbackProvider,
     "yahoo": YahooFinanceProvider,
@@ -755,6 +1011,8 @@ PROVIDER_FACTORIES = {
     "world_bank": WorldBankProvider,
     "worldbank": WorldBankProvider,
     "arxiv": ArxivProvider,
+    "news": ConfigurableNewsProvider,
+    "configured_news": ConfigurableNewsProvider,
     "ifind": lambda: CredentialedPlaceholderProvider("iFinD", settings.ifind_api_key),
     "ths": lambda: CredentialedPlaceholderProvider("同花顺", settings.ths_api_key),
     "tonghuashun": lambda: CredentialedPlaceholderProvider("同花顺", settings.ths_api_key),
@@ -803,6 +1061,13 @@ def data_source_status() -> list[dict[str, Any]]:
             "detail": "使用东方财富 push2his 资金流接口",
         },
         {
+            "name": "news",
+            "role": "实时新闻：授权 JSON API 或 RSS 源转研究 Evidence",
+            "configured": "news" in configured or "configured_news" in configured,
+            "ready": bool(settings.news_json_url or settings.news_rss_urls),
+            "detail": "配置 QUANT_NEWS_JSON_URL 或 QUANT_NEWS_RSS_URLS；可选 QUANT_NEWS_API_KEY",
+        },
+        {
             "name": "postgres",
             "role": "结构化存储：行情、财务、公告、资金流、信号",
             "configured": "postgres" in configured,
@@ -822,10 +1087,29 @@ def data_source_status() -> list[dict[str, Any]]:
 
 def get_provider() -> MarketDataProvider:
     provider_name = settings.data_provider.lower()
-    factory = PROVIDER_FACTORIES.get(provider_name)
-    if factory is None:
-        return ReportFallbackProvider()
-    try:
-        return factory()
-    except Exception:
-        return ReportFallbackProvider()
+    provider_names = [provider_name]
+    if provider_name not in {"eastmoney", "eastmoney_direct"}:
+        provider_names.append("eastmoney_direct")
+    if provider_name != "akshare":
+        provider_names.append("akshare")
+    if provider_name not in {"sina", "sina_kline"}:
+        provider_names.append("sina_kline")
+    if settings.allow_report_fallback:
+        provider_names.append("fallback")
+
+    providers: list[MarketDataProvider] = []
+    labels: list[str] = []
+    failures: list[str] = []
+    for name in provider_names:
+        factory = PROVIDER_FACTORIES.get(name)
+        if factory is None:
+            failures.append(f"{name}: unknown provider")
+            continue
+        try:
+            providers.append(factory())
+            labels.append(name)
+        except Exception as exc:
+            failures.append(f"{name}: {exc}")
+    if not providers:
+        raise ProviderUnavailable("; ".join(failures) or "no provider configured")
+    return ChainedProvider(providers, labels)
