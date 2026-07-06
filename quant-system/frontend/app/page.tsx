@@ -62,19 +62,6 @@ function textValue(value: unknown, fallback = "-"): string {
   return fallback;
 }
 
-function refreshIssueText(value: unknown) {
-  const text = textValue(value, "").replace(/\s+/g, " ").trim();
-  if (!text) return "";
-  const providerIndex = text.indexOf("live providers unavailable:");
-  if (providerIndex >= 0) return text.slice(providerIndex).replace("live providers unavailable:", "实时行情源不可用：");
-  const failedIndex = text.indexOf("Command failed:");
-  if (failedIndex >= 0) {
-    const detail = text.split(" live providers unavailable: ")[1];
-    return detail ? `实时行情源不可用：${detail}` : "实时选股命令执行失败";
-  }
-  return text.length > 220 ? `${text.slice(0, 220)}...` : text;
-}
-
 function firstArray(...items: unknown[]) {
   for (const item of items) {
     if (Array.isArray(item) && item.length) return item as AnyRow[];
@@ -156,6 +143,14 @@ function kellyPct(row: AnyRow, metrics: AnyRow) {
 }
 
 function buildShortTermRows(signals: AnyRow, attribution: AnyRow, metrics: AnyRow) {
+  const config = signals.strategyConfig || {};
+  const priceAction = config.priceAction || {};
+  const liquidity = config.liquidity || {};
+  const strongPctLow = Number(priceAction.strongPctLow ?? 2.2);
+  const chaseRiskPct = Number(priceAction.chaseRiskPct ?? 7.2);
+  const volumeRatioTrigger = Number(liquidity.volumeRatioTrigger ?? 1.5);
+  const turnoverPreferredLow = Number(liquidity.turnoverPreferredLowPct ?? 5);
+  const turnoverPreferredHigh = Number(liquidity.turnoverPreferredHighPct ?? 20);
   const attributionByCode = new Map(firstArray(attribution.rows).map((row) => [String(row.code).padStart(6, "0"), row]));
   return firstArray(signals.trade, signals.watch)
     .filter((row) => isMainBoardCode(row.code))
@@ -169,6 +164,9 @@ function buildShortTermRows(signals: AnyRow, attribution: AnyRow, metrics: AnyRo
       const volumeScore = Number(row.volume_score ?? 50);
       const themeScore = clamp(Number(row.theme_heat_score ?? attr.qScore ?? 50), 0, 100);
       const emotionScore = clamp(Number(attr.qScore ?? row.emotionScore ?? row.theme_heat_score ?? 50), 0, 100);
+      const pctValue = Number(row.pct_chg ?? row.pct ?? 0);
+      const turnover = Number(row.turnover ?? 0);
+      const volumeRatio = Number(row.volume_ratio ?? row.volumeRatio ?? row.vr ?? 0);
       const battleScore = clamp(
         Number(row.score ?? 0) * 0.34 +
           moneyScore * 0.22 +
@@ -179,8 +177,15 @@ function buildShortTermRows(signals: AnyRow, attribution: AnyRow, metrics: AnyRo
         0,
         100,
       );
+      const factorTags = firstArray(row.factorTags, row.factor_tags);
+      const vetoReasons = firstArray(row.vetoReasons, row.veto_reasons, row.blockedReasons);
+      const derivedTags = [
+        pctValue >= strongPctLow && pctValue <= chaseRiskPct ? `涨幅 ${num(pctValue, 1)}%` : "",
+        volumeRatio >= volumeRatioTrigger ? `量比 ${num(volumeRatio, 2)}` : "",
+        turnover >= turnoverPreferredLow && turnover <= turnoverPreferredHigh ? `换手 ${num(turnover, 1)}%` : "",
+      ].filter(Boolean);
       const plan =
-        battleScore >= 82 && Number(row.pct_chg ?? row.pct ?? 0) < 7
+        battleScore >= 82 && pctValue < chaseRiskPct
           ? "可试错"
           : battleScore >= 72
             ? "等回踩"
@@ -195,6 +200,8 @@ function buildShortTermRows(signals: AnyRow, attribution: AnyRow, metrics: AnyRo
         volumeScore,
         themeScore,
         emotionScore,
+        factorTags: factorTags.length ? factorTags : derivedTags,
+        vetoReasons,
         battleScore,
         kelly: kellyPct(row, metrics),
         plan,
@@ -204,54 +211,73 @@ function buildShortTermRows(signals: AnyRow, attribution: AnyRow, metrics: AnyRo
     .slice(0, 6);
 }
 
-function DataRefreshPanel({ report, timestamp }: { report: AnyRow; timestamp: string }) {
-  const status = String(report.status || "UNKNOWN");
-  const running = status === "RUNNING";
-  const failed = report.ok === false || status === "FAILED";
-  const steps = Array.isArray(report.steps) ? report.steps : [];
-  const failures = firstArray(report.criticalFailures).map(refreshIssueText).filter(Boolean);
-  const warning = refreshIssueText(report.warning);
-  const detail = refreshIssueText(report.detail);
-  const latestIssue = failures[0] || detail || warning;
-  const tone = running ? "warn" : failed ? "danger" : "good";
-  const statusLabel = running ? "刷新中" : failed ? "刷新失败" : status === "SUCCESS" ? "已更新" : "待更新";
-
+function DataRefreshPanel() {
   return (
-    <section className={`dataRefreshPanel ${tone}`}>
-      <div className="dataRefreshMain">
-        <div className="dataRefreshTitle">
-          <Database size={18} />
-          <div>
-            <span>数据更新</span>
-            <h2>{statusLabel}</h2>
-          </div>
-        </div>
-        <p>
-          交易日期 {report.tradeDate || "-"} · 最近完成 {report.finishedAt ? new Date(report.finishedAt).toLocaleString("zh-CN", { hour12: false }) : timestamp}
-        </p>
-        {latestIssue && <strong>{latestIssue}</strong>}
-      </div>
-      <div className="dataRefreshMeta">
-        <div>
-          <span>刷新步骤</span>
-          <b>{steps.length}</b>
-        </div>
-        <div>
-          <span>质量状态</span>
-          <b>{failed ? "BLOCK" : running ? "RUNNING" : "OK"}</b>
-        </div>
-      </div>
-      <div className="dataRefreshAction">
+    <section className="dataRefreshPanel">
+      <div className="dataRefreshAction" aria-label="数据刷新">
         <RefreshDataButton />
       </div>
-      {failures.length > 1 && (
-        <div className="dataRefreshIssues">
-          {failures.slice(0, 3).map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-        </div>
-      )}
     </section>
+  );
+}
+
+function recommendationSector(row: AnyRow) {
+  return textValue(row.industry || row.sector || row.primary_industry || row.primary_theme || row.theme, "未标行业");
+}
+
+function HomeRecommendationPanel({ rows, liveBuyAllowed, dataDate }: { rows: AnyRow[]; liveBuyAllowed: boolean; dataDate: string }) {
+  const displayRows = rows.slice(0, 8);
+  return (
+    <Panel title="首页推荐股" icon={TrendingUp} className="homeRecommendationPanel">
+      <div className="homeRecommendationHead">
+        <div>
+          <strong>{displayRows.length} 只候选</strong>
+          <span>数据日期 {dataDate}</span>
+        </div>
+        <Badge tone={liveBuyAllowed ? "good" : "lock"}>{liveBuyAllowed ? "可执行" : "观察为主"}</Badge>
+      </div>
+      <div className="q-table-wrap homeRecommendationTable">
+        <table className="q-table">
+          <thead>
+            <tr>
+              <th>代码</th>
+              <th>名称</th>
+              <th>行业/主线</th>
+              <th>评分</th>
+              <th>涨跌幅</th>
+              <th>买入区间</th>
+              <th>止损</th>
+              <th>目标</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayRows.map((row, index) => {
+              const pctValue = Number(row.pct_chg ?? row.pct ?? 0);
+              const action = textValue(row.execution_status || row.confirmation_status || row.action, "-");
+              return (
+                <tr key={`${row.code || index}-${row.name || "recommendation"}`}>
+                  <td className="mono">{String(row.code || "-").padStart(6, "0")}</td>
+                  <td>{textValue(row.name)}</td>
+                  <td>{recommendationSector(row)}</td>
+                  <td><span className="score">{num(row.score, 0)} 分</span></td>
+                  <td className={pctValue >= 0 ? "up" : "down"}>{pct(pctValue)}</td>
+                  <td>{textValue(row.buy_zone || row.entry?.buyZone)}</td>
+                  <td>{num(row.stop_loss ?? row.exit?.stop)}</td>
+                  <td>{num(row.target_price ?? row.exit?.target)}</td>
+                  <td><Badge tone={action.includes("BUY") || action.includes("OPEN") ? "good" : action.includes("BLOCK") ? "danger" : "warn"}>{action}</Badge></td>
+                </tr>
+              );
+            })}
+            {!displayRows.length && (
+              <tr>
+                <td colSpan={9}>暂无推荐股，刷新数据后再查看。</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
   );
 }
 
@@ -260,6 +286,16 @@ function ShortTermBattlePanel({ rows, signals, workbench }: { rows: AnyRow[]; si
   const wait = rows.filter((row) => row.plan === "等回踩").length;
   const avgKelly = rows.length ? rows.reduce((sum, row) => sum + Number(row.kelly || 0), 0) / rows.length : 0;
   const topTheme = textValue(rows[0]?.primary_theme || rows[0]?.theme || workbench.tradeWorkbench?.summary?.attackThemes, "等待主线确认");
+  const config = signals.strategyConfig || {};
+  const priceAction = config.priceAction || {};
+  const liquidity = config.liquidity || {};
+  const market = config.market || {};
+  const configSummary = [
+    `主板 ${Array.isArray(market.includeCodePrefixes) ? market.includeCodePrefixes.join("/") : "000/600"}`,
+    `涨幅 ${num(priceAction.strongPctLow ?? 2.2, 1)}-${num(priceAction.strongPctHigh ?? 6.8, 1)}%`,
+    `量比 >=${num(liquidity.volumeRatioTrigger ?? 1.5, 1)}`,
+    `优选换手 ${num(liquidity.turnoverPreferredLowPct ?? 5, 0)}-${num(liquidity.turnoverPreferredHighPct ?? 20, 0)}%`,
+  ];
   return (
     <section className="shortBattlePanel">
       <div className="shortBattleHead">
@@ -273,6 +309,11 @@ function ShortTermBattlePanel({ rows, signals, workbench }: { rows: AnyRow[]; si
           <Badge tone="warn">1-3日节奏</Badge>
           <Badge tone="lock">不追直线拉升</Badge>
         </div>
+      </div>
+      <div className="strategyConfigStrip">
+        {configSummary.map((item) => (
+          <span key={item}>{item}</span>
+        ))}
       </div>
 
       <div className="shortBattleMetrics">
@@ -317,6 +358,20 @@ function ShortTermBattlePanel({ rows, signals, workbench }: { rows: AnyRow[]; si
               <span>目标 <b>{num(row.target_price)}</b></span>
               <span>ATR <b>{row.atrPct == null ? "-" : `${num(row.atrPct, 2)}%`}</b></span>
               <span>Kelly <b>{num(row.kelly, 1)}%</b></span>
+            </div>
+            <div className="shortSignalExplain">
+              <div>
+                <span>触发因子</span>
+                {(firstArray(row.factorTags).length ? firstArray(row.factorTags) : ["等待量价确认"]).slice(0, 4).map((item) => (
+                  <em key={textValue(item)}>{textValue(item)}</em>
+                ))}
+              </div>
+              <div>
+                <span>否决/降级</span>
+                {(firstArray(row.vetoReasons).length ? firstArray(row.vetoReasons) : ["暂无硬否决"]).slice(0, 3).map((item) => (
+                  <em key={textValue(item)}>{textValue(item)}</em>
+                ))}
+              </div>
             </div>
             <p>{textValue(row.position_hint || row.execution_note || row.reason, "等待盘中承接确认")}</p>
           </article>
@@ -561,7 +616,8 @@ export default async function QuantTerminalPage() {
   const paperTrading = readProductJson<AnyRow>("reports/data/paper-trading-state.json", {});
   const tradingSignals = readProductJson<AnyRow>("reports/data/latest-trading-signals.json", {});
   const watchlistAttribution = readProductJson<AnyRow>("reports/data/user-watchlist-attribution.json", {});
-  const refreshReport = readProductJson<AnyRow>("reports/data/latest-refresh-report.json", {});
+  const recommendation = workbench.recommendation || {};
+  const recommendedBuys = firstArray(recommendation.recommendedBuys);
 
   const strongRows = firstArray(
     workbench.openWatch?.newStrong,
@@ -600,9 +656,11 @@ export default async function QuantTerminalPage() {
         </header>
 
         <section id="dashboard" className="q-section">
-          <DataRefreshPanel report={refreshReport} timestamp={timestamp} />
+          <DataRefreshPanel />
 
           <MarketSearchPanel />
+
+          <HomeRecommendationPanel rows={recommendedBuys} liveBuyAllowed={Boolean(recommendation.liveBuyAllowed)} dataDate={textValue(recommendation.tradeDate || recommendation.dataDate || workbench.tradeDate || timestamp)} />
 
           <ShortTermBattlePanel rows={shortTermRows} signals={tradingSignals} workbench={workbench} />
 

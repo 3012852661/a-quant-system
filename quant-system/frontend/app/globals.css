@@ -191,27 +191,14 @@ th,
 
 .dataRefreshPanel {
   min-width: 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 220px auto;
-  gap: 12px;
-  align-items: stretch;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-left-width: 3px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 42px;
+  padding: 0;
+  border: 0;
   border-radius: var(--radius);
-  background: rgba(30, 41, 59, 0.82);
-}
-
-.dataRefreshPanel.good {
-  border-left-color: var(--green);
-}
-
-.dataRefreshPanel.warn {
-  border-left-color: var(--amber);
-}
-
-.dataRefreshPanel.danger {
-  border-left-color: var(--red);
+  background: transparent;
 }
 
 .dataRefreshMain {
@@ -283,6 +270,47 @@ th,
   display: flex;
   align-items: center;
   justify-content: flex-end;
+}
+
+.homeRecommendationPanel .q-panel-title svg {
+  color: var(--red);
+}
+
+.homeRecommendationHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.homeRecommendationHead div {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.homeRecommendationHead strong {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.homeRecommendationHead span {
+  color: var(--muted);
+  font: 12px/1 var(--mono);
+}
+
+.homeRecommendationTable {
+  margin-top: 0 !important;
+}
+
+.homeRecommendationTable .q-table {
+  min-width: 980px;
+}
+
+.homeRecommendationTable td:nth-child(3) {
+  min-width: 120px;
+  color: var(--text);
+  font-weight: 700;
 }
 
 .dataRefreshIssues {
@@ -2837,6 +2865,21 @@ th,
   gap: 8px;
 }
 
+.strategyConfigStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.strategyConfigStrip span {
+  padding: 7px 9px;
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: var(--radius);
+  background: rgba(8, 47, 73, 0.28);
+  color: var(--body);
+  font: 800 11px/1 var(--mono);
+}
+
 .shortBattleMetrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2950,6 +2993,43 @@ th,
   font: 800 11px/1 var(--mono);
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.shortSignalExplain {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.shortSignalExplain div {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  background: rgba(2, 6, 23, 0.22);
+}
+
+.shortSignalExplain span {
+  width: 100%;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.shortSignalExplain em {
+  max-width: 100%;
+  padding: 4px 6px;
+  border-radius: 6px;
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--body);
+  font-size: 10px;
+  font-style: normal;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .shortBattleReview {
